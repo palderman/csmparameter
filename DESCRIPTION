@@ -1,11 +1,16 @@
 Package: parametR
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Parameter sensitivity analysis and estimation for the DSSAT-CSM
+Version: 0.0.0.9000
+Author: Phillip D. Alderman [aut, cre]
+Maintainer: Phillip D. Alderman <phillip.alderman@okstate.edu>
+Description: The purpose of this package is to provide parameter
+  sensitivity analysis and estimation capability for the Decision
+  Support System for Agrotechnology Transfer Cropping Systems Model
+  (DSSAT-CSM).
+License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    DSSAT
+RoxygenNote: 7.1.2
