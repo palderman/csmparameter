@@ -1,24 +1,9 @@
+#'
+#' @importFrom dplyr "%>%" full_join
+#'
 #' @export
 #'
-as_dssat_expmt_tbl <- function(tbl_in){
-  UseMethod("as_dssat_expmt_tbl")
-}
-
-#' @export
-#'
-as_dssat_expmt_tbl.default <- function(tbl_in){
-  if(class(tbl_in)[1] != 'dssat_expmt_tbl'){
-    tbl_out <- tbl_in
-    class(tbl_out) <- c('dssat_expmt_tbl',class(tbl_in))
-  }else{
-    tbl_out <- tbl_in
-  }
-  return(tbl_out)
-}
-
-#' @export
-#'
-add_expmt <- function(.expmt_tbl,...){
+add_expmt <- function(.expmt_tbl, ...){
 
   .expmt_tbl <- create_expmt(...) %>%
       full_join(.expmt_table,.,by='filex') %>%
@@ -28,6 +13,9 @@ add_expmt <- function(.expmt_tbl,...){
 
 }
 
+#'
+#' @importFrom dplyr "%>%" mutate full_join
+#'
 #' @export
 #'
 join_filea_filet <- function(filea=NULL,filet=NULL){
@@ -36,7 +24,7 @@ join_filea_filet <- function(filea=NULL,filet=NULL){
       mutate(DATE = as.POSIXct('0001001',format='%Y%j',tz='UTC'))
   }
   if(!is.null(filet) & !is.null(filea)){
-    joined_data <- full_join(filea,filet)
+    joined_data <- full_join(filea, filet)
   }else if(!is.null(filet)){
     joined_data <- filet
   }else{
@@ -45,20 +33,29 @@ join_filea_filet <- function(filea=NULL,filet=NULL){
   return(joined_data)
 }
 
+#'
+#' @importFrom dplyr "%>%" select rename left_join
+#'
 #' @export
 #'
 get_pdate <- function(filex){
 
   pdate <- filex$TREATMENTS %>%
-    select(N,MP) %>%
-    rename(TRNO=N) %>%
-    left_join(filex$`PLANTING DETAILS`,by = c("MP"="P")) %>%
-    select(TRNO,PDATE)
+    select(N, MP) %>%
+    rename(TRNO = N) %>%
+    left_join(filex$`PLANTING DETAILS`, by = c("MP"="P")) %>%
+    select(TRNO, PDATE)
 
   return(pdate)
 
 }
 
+#'
+#' @importFrom purrr map_lgl
+#' @importFrom stringr str_detect str_replace
+#' @importFrom lubridate is.POSIXct
+#' @importFrom dplyr "%>%" left_join mutate_if select
+#'
 #' @export
 #'
 dat_to_dap <- function(pdate,.data){
@@ -112,9 +109,9 @@ create_expmt_tbl <- function(filex_name, trno=NULL, data_types=NULL,
 
 #' @export
 #'
-#'
+#' @importFrom DSSAT read_filea read_filex read_filet write_filex
 #' @importFrom dplyr "%>%" filter mutate select
-#' @importFrom stringr str_replace str_detect
+#' @importFrom stringr str_replace str_detect str_sub
 #' @importFrom tibble tibble
 #' @importFrom tidyr pivot_longer
 #'
@@ -180,10 +177,10 @@ create_dssat_expmt <- function(filex_name, trno=NULL, data_types=NULL,
 
   joined_data <- join_filea_filet(filea,filet) %>%
     filter(TRNO %in% trno) %>%
-    tidyr::pivot_longer(names_to='variable',values_to = 'obs',cols=c(-TRNO,-DATE)) %>%
+    pivot_longer(names_to='variable',values_to = 'obs',cols=c(-TRNO,-DATE)) %>%
     mutate(EXPERIMENT=str_sub(filex_name,1,8)) %>%
     select(EXPERIMENT,TRNO,DATE,everything()) %>%
-    filter(!is.na(obs))
+    filter(!is.na(obs) & variable %in% data_types)
 
   sim_data_template <- joined_data %>%
     select(EXPERIMENT,TRNO,DATE,variable)
@@ -209,7 +206,11 @@ create_dssat_expmt <- function(filex_name, trno=NULL, data_types=NULL,
   return(expmt)
 
 }
-
+#'
+#' @importFrom dplyr "%>%" select
+#' @importFrom tidyr unnest
+#' @importFrom DSSAT write_dssbatch
+#'
 #' @export
 #'
 write_dssbatch.dssat_expmt_tbl <- function(expmt_tbl){
@@ -217,7 +218,7 @@ write_dssbatch.dssat_expmt_tbl <- function(expmt_tbl){
   expmt_tbl %>%
     select(filex_name,trno) %>%
     unnest(trno) %>%
-    {write_dssbatch.default(x = .$filex_name, trtno = .$trno)}
+    {write_dssbatch(x = .$filex_name, trtno = .$trno)}
 
 }
 
@@ -226,13 +227,17 @@ as_dssat_prm_tbl <- function(tbl_in){
   UseMethod("as_dssat_prm_tbl")
 }
 
+#'
+#' @importFrom tibble as_tibble
+#'
 #' @export
+#'
  as_dssat_prm_tbl.default <- function(tbl_in){
 
   if(class(tbl_in)[1] != 'dssat_prm_tbl'){
 
     tbl_out <- as_tibble(tbl_in)
-    class(tbl_out) <- c('dssat_prm_tbl',class(tbl_in))
+    class(tbl_out) <- c('dssat_prm_tbl', class(tbl_in))
 
   }else{
 
@@ -242,6 +247,10 @@ as_dssat_prm_tbl <- function(tbl_in){
   return(tbl_out)
 }
 
+#'
+#' @importFrom dplyr "%>%"
+#' @importFrom tibble tibble
+#'
 #' @export
 create_dssat_prm <- function(pname, pfile,
                              pmin = -Inf,
@@ -280,10 +289,12 @@ create_dssat_prm <- function(pname, pfile,
 
 }
 
-#' @export
 #'
 #' @importFrom readr read_csv
 #' @importFrom dplyr "%>%" pull
+#'
+#' @export
+#'
 import_prm_tbl_csv <- function(file_name){
 
   prm_tbl_csv <- read_csv(file_name)
@@ -402,9 +413,11 @@ import_prm_tbl_csv <- function(file_name){
 
 }
 
-#' @export
 #'
 #' @importFrom dplyr "%>%" group_by summarize arrange pull
+#'
+#' @export
+#'
 get_pmax <- function(.prm_tbl){
   .prm_tbl %>%
     group_by(pnum) %>%
@@ -413,9 +426,11 @@ get_pmax <- function(.prm_tbl){
     pull(pmax)
 }
 
-#' @export
 #'
 #' @importFrom dplyr "%>%" group_by summarize arrange pull
+#'
+#' @export
+#'
 get_pmin <- function(.prm_tbl){
   .prm_tbl %>%
     group_by(pnum) %>%
@@ -424,9 +439,11 @@ get_pmin <- function(.prm_tbl){
     pull(pmin)
 }
 
-#' @export
 #'
 #' @importFrom dplyr "%>%" group_by summarize arrange pull
+#'
+#' @export
+#'
 get_pmu <- function(.prm_tbl){
   .prm_tbl %>%
     group_by(pnum) %>%
@@ -435,6 +452,9 @@ get_pmu <- function(.prm_tbl){
     pull(pmu)
 }
 
+#'
+#' @importFrom dplyr "%>%" full_join
+#'
 #' @export
 #'
 add_dssat_prm <- function(.prm_tbl, ...){
@@ -446,6 +466,9 @@ add_dssat_prm <- function(.prm_tbl, ...){
   return(.prm_tbl)
 }
 
+#'
+#' @importFrom dplyr group_by "%>%" group_map rowwise mutate
+#'
 #' @export
 #'
 add_pfmt <- function(.prm_tbl, input_tbl){
@@ -463,14 +486,18 @@ add_pfmt <- function(.prm_tbl, input_tbl){
 
 }
 
+#'
+#' @importFrom stringi stri_rand_strings
+#' @importFrom stringr str_detect
+#'
 generate_pregex <- function(widths){
 
   for(i in 1:1000){
-    pregex <- stringi::stri_rand_strings(length(widths),widths)
+    pregex <- stringi::stri_rand_strings(length(widths), widths)
     found = FALSE
     for(j in 1:length(pregex)){
       if(!found){
-        found = any(str_detect(pregex[-j],pregex[j]))
+        found = any(str_detect(pregex[-j], pregex[j]))
       }else{
         break
       }
@@ -482,6 +509,10 @@ generate_pregex <- function(widths){
 
 }
 
+#'
+#' @importFrom dplyr "%>%" ungroup mutate
+#' @importFrom stringr str_extract str_remove
+#'
 #' @export
 #'
 add_pregex <- function(.prm_tbl){
@@ -504,13 +535,16 @@ as_dssat_input_tbl <- function(tbl_in){
   UseMethod("as_dssat_input_tbl")
 }
 
+#' @importFrom tibble as_tibble
+#'
 #' @export
+#'
 as_dssat_input_tbl.default <- function(tbl_in){
 
   if(class(tbl_in)[1] != 'dssat_input_tbl'){
 
     tbl_out <- as_tibble(tbl_in)
-    class(tbl_out) <- c('dssat_input_tbl',class(tbl_in))
+    class(tbl_out) <- c('dssat_input_tbl', class(tbl_in))
 
   }else{
 
@@ -520,6 +554,12 @@ as_dssat_input_tbl.default <- function(tbl_in){
   return(tbl_out)
 }
 
+#'
+#' @importFrom tibble tibble
+#' @importFrom dplyr "%>%"
+#' @importFrom stringr str_detect str_subset str_c
+#' @importFrom DSSAT read_cul read_eco
+#'
 #' @export
 #'
 create_dssat_input <- function(file_path, ...){
@@ -556,6 +596,9 @@ create_dssat_input <- function(file_path, ...){
 
 }
 
+#'
+#' @importFrom dplyr "%>%" bind_rows
+#'
 #' @export
 #'
 add_dssat_input <- function(.input_tbl,...){
@@ -567,9 +610,13 @@ add_dssat_input <- function(.input_tbl,...){
   return(.input_tbl)
 }
 
+#'
+#' @importFrom dplyr "%>%"
+#' @importFrom stringr str_extract str_remove
+#'
 #' @export
 #'
-modify_vfmt <- function(.input,pname,pfmt){
+modify_vfmt <- function(.input, pname, pfmt){
 
   v_fmt <- attr(.input,'v_fmt')
 
@@ -584,16 +631,19 @@ modify_vfmt <- function(.input,pname,pfmt){
 
 }
 
+#'
+#' @importFrom DSSAT write_cul write_eco
+#'
 #' @export
 #'
-generate_file_template <- function(file_name,file_processed){
+generate_file_template <- function(file_name, file_processed){
 
-  tmp_con <- textConnection('file_template',open='w',local=TRUE)
+  tmp_con <- textConnection('file_template', open='w', local=TRUE)
 
   if(str_detect(file_name,'\\.CUL$')){
-    write_cul(file_processed,tmp_con)
+    write_cul(file_processed, tmp_con)
   }else if(str_detect(file_name,'\\.ECO$')){
-    write_eco(file_processed,tmp_con)
+    write_eco(file_processed, tmp_con)
   }
 
   return(list(file_template))
@@ -603,7 +653,8 @@ generate_file_template <- function(file_name,file_processed){
 #' @export
 #'
 #' @importFrom dplyr "%>%" filter group_by group_modify mutate ungroup select
-#' @importFrom stringr str_replace_all
+#' @importFrom stringr str_replace_all str_detect
+#' @importFrom DSSAT mutate_cond
 #'
 add_input_template <- function(.input_tbl,.prm_tbl){
 
@@ -655,6 +706,9 @@ generate_prm_replace <- function(pvals,.prm_tbl){
 
 #' @export
 #'
+#' @importFrom dplyr "%>%" group_by group_walk
+#' @importFrom stringr str_replace_all
+#'
 write_inputs <- function(.input_tbl,.prm_tbl,pvals){
 
   prm_replace <- generate_prm_replace(pvals,.prm_tbl)
@@ -667,7 +721,8 @@ write_inputs <- function(.input_tbl,.prm_tbl,pvals){
   return(invisible())
 }
 
-#' @export
+#' @importFrom dplyr "%>%" group_by group_walk
+#' @importFrom DSSAT write_filex
 #'
 write_exmpt_filex <- function(.expmt_tbl){
 
@@ -683,14 +738,31 @@ write_exmpt_filex <- function(.expmt_tbl){
 
 }
 
-#' @export
+#' @importFrom dplyr "%>%" rowwise mutate ungroup arrange filter select
+#' @importFrom tibble tibble
+#' @importFrom purrr map map_lgl
+#' @importFrom stringr str_c str_subset
 #'
 find_output_variables <- function(.expmt){
 
-  out_tbl <- list.files(pattern = '\\.OUT') %>%
+  raw_out_files <- list.files(pattern = '\\.OUT') %>%
     {c('Summary.OUT','PlantGro.OUT',.)} %>%
     unique() %>%
-    {names(.) <- .; .} %>%
+    str_subset("Measured", negate = TRUE) %>%
+    setNames(.,.) %>%
+    map(~readLines(.))
+
+  data_type_regex <- .expmt$data_types %>%
+    unlist() %>%
+    str_c("(", ., ")") %>%
+    str_c(collapse = "|")
+
+  out_tbl <- raw_out_files %>%
+    map_lgl(~any(str_detect(., "^ *@") &
+                   str_detect(., data_type_regex))) %>%
+    subset(raw_out_files, .) %>%
+    names() %>%
+    setNames(.,.) %>%
     map(~try(suppressWarnings(read_output(.)), silent = TRUE)) %>%
     {.[map_lgl(.,~{ ! 'try-error' %in% class(.) })]} %>%
     {.[map_lgl(.,~{ any(colnames(.) %in% unlist(.expmt$data_types)) })]} %>%
@@ -729,9 +801,8 @@ find_output_variables <- function(.expmt){
 
 }
 
-#' @export
-#'
 #' @importFrom dplyr "%>%" group_by mutate group_modify
+#' @importFrom DSSAT run_dssat
 #'
 add_output_tbl <- function(.expmt){
 
@@ -776,7 +847,8 @@ read_sim_data <- function(run_tbl){
     unnest(out_tbl) %>%
     group_by(file_name) %>%
     group_map(~{
-      read_output(.y$file_name,read_only = c('TRNO','DATE','RUN','RUNNO',.x$col_names)) %>%
+      # read_output(.y$file_name,read_only = c('TRNO','DATE','RUN','RUNNO',.x$col_names)) %>%
+      read_output(.y$file_name) %>%
         {
           if( ! 'DATE' %in% names(.)){
             . <- add_column(.,DATE = as.POSIXct('0001001',format='%Y%j',tz='UTC'))
@@ -895,11 +967,39 @@ SSE_fun <- function(obs_tbl,sim_tbl){
 
 #' @export
 #'
-construct_prmest <- function(expmt_tbl,input_tbl,prm_tbl,stat_fun){
+#' @importFrom dplyr "%>%"
+#' @importFrom stringr str_c
+#'
+construct_prmest <- function(expmt_tbl, input_tbl,
+                             prm_tbl, stat_fun, dssat_call){
+
+  if(missing(dssat_call)){
+    dssat_exec <- getOption("DSSAT.CSM")
+    if(is.null(dssat_exec)) stop("Please include a value for the dssat_call argument or set the executable using options(DSSAT.CSM = \"<path to executable>\")")
+    version <- DSSAT:::get_dssat_version()
+    file_name <- str_c("DSSBatch.V", version)
+    dssat_call <- dssat_exec %>%
+      str_c("B", file_name, sep = " ")
+  }
+
+  run_tbl <- expmt_tbl %>%
+    summarize(filex_trno = tibble(filex_name = filex_name,trno = trno) %>%
+                unnest(cols=trno) %>%
+                list(),
+              sim_template = sim_template %>%
+                map(~full_join(.$data_template[[1]],.$pdate[[1]])) %>%
+                reduce(full_join) %>%
+                list(),
+              out_tbl = out_tbl %>%
+                map(~unnest(.,cols=col_names)) %>%
+                reduce(full_join) %>%
+                list(),
+              dssat_call = dssat_call)
 
   prmest <- list(expmt_tbl = expmt_tbl,
                  input_tbl = input_tbl,
                  prm_tbl = prm_tbl,
+                 run_tbl = run_tbl,
                  stat_fun = stat_fun)
 
   return(prmest)
