@@ -198,7 +198,7 @@ create_dssat_expmt <- function(filex_name, trno=NULL, data_types=NULL,
   }
 
   expmt <- tibble(filex_name = filex_name, filex = list(filex),
-                  obs_data = list(joined_data), trno = list(trno),
+                  obs_tbl = list(joined_data), trno = list(trno),
                   data_types = list(data_types), sim_template = list(sim_template)) %>%
     add_output_tbl() %>%
     as_dssat_expmt_tbl()
@@ -857,13 +857,15 @@ read_sim_data <- function(run_tbl){
         } %>%
         filter(TRNO %in% run_tbl$sim_template[[1]]$TRNO &
                DATE %in% run_tbl$sim_template[[1]]$DATE) %>%
-        rename_all(~str_replace(.,'RUNNO','RUN'))
+        rename_all(~str_replace(.,'RUNNO','RUN')) %>%
+        select(-matches("(EXPERIMENT)|(MODEL)")) %>%
+        full_join(run_expmt) %>%
+        select(any_of(c("EXPERIMENT", "TRNO", all_cols))) %>%
+        pivot_longer(names_to = "variable",
+                     values_to = "sim",
+                     cols = any_of(all_cols))
     }) %>%
-    reduce(full_join) %>%
-    select(-matches("(EXPERIMENT)|(MODEL)")) %>%
-    full_join(run_expmt) %>%
-    select(c("EXPERIMENT", "MODEL", "TRNO", all_cols)) %>%
-    pivot_longer(names_to = "variable", values_to = "sim", cols = one_of(all_cols)) %>%
+    bind_rows() %>%
     left_join(run_tbl$sim_template[[1]],.) %>%
     mutate(sim = ifelse(str_detect(variable,'DAT$'),
                         as.numeric(difftime(as.POSIXct(sim,tz='UTC',origin='1970-01-01'),
@@ -996,10 +998,15 @@ construct_prmest <- function(expmt_tbl, input_tbl,
                 list(),
               dssat_call = dssat_call)
 
+  obs_tbl <- expmt_tbl %>%
+    pull(obs_tbl) %>%
+    bind_rows()
+
   prmest <- list(expmt_tbl = expmt_tbl,
                  input_tbl = input_tbl,
                  prm_tbl = prm_tbl,
                  run_tbl = run_tbl,
+                 obs_tbl = obs_tbl,
                  stat_fun = stat_fun)
 
   return(prmest)
