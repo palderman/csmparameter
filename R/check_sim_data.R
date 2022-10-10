@@ -6,7 +6,9 @@ check_sim_data <- function(obs_sim){
     warn_out <- obs_sim %>%
       filter(is.na(sim)) %>%
       {capture.output(print(.))} %>%
-      c("Missing values were present in simulated output. The objective function value will be set to Inf.",
+      c(paste0("Missing values were present in simulated output.",
+               " The objective function value will be set to ",
+               .Machine$double.xmax,"."),
         "The following observations were missing:",
         .) %>%
       str_c('\n')

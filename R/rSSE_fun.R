@@ -11,7 +11,7 @@ rSSE_fun <- function(obs_tbl,sim_tbl){
       summarize(rSSE = sum(rSSE)) %>%
       pull(rSSE)
   }else{
-    rSSE <- Inf
+    rSSE <- .Machine$double.xmax
   }
 
   return(rSSE)
