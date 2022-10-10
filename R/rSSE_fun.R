@@ -1,6 +1,6 @@
 #' @export
 #'
-rSSE_fun <- function(obs_tbl,sim_tbl){
+rSSE_fun <- function(obs_tbl, sim_tbl, ...){
 
   if(check_sim_data(sim_tbl)){
     rSSE <- obs_tbl %>%
