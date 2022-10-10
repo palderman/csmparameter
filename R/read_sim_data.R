@@ -1,10 +1,11 @@
 #' @export
 #'
 #' @importFrom dplyr "%>%" group_by mutate filter full_join left_join group_map
+#'   n ungroup select pull rename_with bind_rows
 #' @importFrom purrr reduce
 #' @importFrom tibble add_column
 #' @importFrom stringr str_detect
-#' @importFrom tidyr gather
+#' @importFrom tidyr pivot_longer unnest
 #'
 read_sim_data <- function(run_tbl){
 
@@ -44,7 +45,7 @@ read_sim_data <- function(run_tbl){
           } %>%
           filter(TRNO %in% run_tbl$sim_template[[1]]$TRNO &
                  DATE %in% run_tbl$sim_template[[1]]$DATE) %>%
-          rename_all(~str_replace(.,'RUNNO','RUN')) %>%
+          rename_with(~str_replace(.,'RUNNO','RUN')) %>%
           select(-matches("(EXPERIMENT)|(MODEL)")) %>%
           full_join(run_expmt) %>%
           select(any_of(c("EXPERIMENT", "TRNO", all_cols))) %>%

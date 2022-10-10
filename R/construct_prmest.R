@@ -27,7 +27,8 @@ construct_prmest <- function(expmt_tbl, input_tbl,
                 map(~unnest(.,cols=col_names)) %>%
                 reduce(full_join) %>%
                 list(),
-              dssat_call = dssat_call)
+              dssat_call = dssat_call,
+              .groups = "keep")
 
   obs_tbl <- expmt_tbl %>%
     pull(obs_tbl) %>%
