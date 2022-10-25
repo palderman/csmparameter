@@ -16,10 +16,10 @@ test_that("pname", {
   new_tbl <- parametR::prm_add_variances(prm_tbl, obs_tbl)
 
   expect_identical(new_tbl[["pname"]],
-                   c("INST0001_1_0001-01-01_HWAM",
-                     "INST0001_1_0001-01-01_HIAM",
-                     "INST0001_2_0001-01-01_HWAM",
-                     "INST0001_2_0001-01-01_HIAM"
+                   c("EXPERIMENT:INST0001_TRNO:1_DATE:1-001_HWAM",
+                     "EXPERIMENT:INST0001_TRNO:1_DATE:1-001_HIAM",
+                     "EXPERIMENT:INST0001_TRNO:2_DATE:1-001_HWAM",
+                     "EXPERIMENT:INST0001_TRNO:2_DATE:1-001_HIAM"
                    ))
 
 })
