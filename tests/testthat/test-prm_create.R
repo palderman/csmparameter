@@ -41,7 +41,8 @@ test_that("single parameter full specification", {
                        pmu = 25,
                        psigma = 5,
                        pdist = "normal"
-                     )))
+                     )),
+                     ignore_function_env = TRUE)
 
 })
 
@@ -101,6 +102,7 @@ test_that("three parameter full specification", {
                        pmu = 3.8,
                        psigma = 6.2,
                        pdist = "normal")
-                   ))
+                   ),
+                   ignore_function_env = TRUE)
 
 })

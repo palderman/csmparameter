@@ -4,7 +4,7 @@
 #'
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr summarize mutate pull
-#' @importFrom tidyr pivot_longer pivot_wider unite
+#' @importFrom tidyr pivot_longer pivot_wider unite unnest
 #' @importFrom purrr map_chr
 #' @importFrom stringr str_c
 #' @importFrom tibble tibble
@@ -29,8 +29,9 @@ prm_add_variances <- function(prm_tbl,
            across(where(~{!is.character(.)}), as.character)) %>%
     pivot_longer(everything()) %>%
     mutate(value = str_c(name, value, sep = ":")) %>%
-    pivot_wider() %>%
-    unite(all, everything()) %>%
+    pivot_wider(values_fn = list) %>%
+    unnest(everything()) %>%
+    unite(all, everything(), sep = ";") %>%
     pull(all)
 
   output <- tibble(pname = pname)
