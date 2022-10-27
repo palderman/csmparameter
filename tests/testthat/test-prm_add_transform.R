@@ -8,21 +8,22 @@ test_that("ptrans_internal",{
 
 })
 
-test_that("ptrans_create",{
-  expect_identical(deparse(
-                     parametR::ptrans_create(c("p1", "p3", "p2"), p1+p2+p3/p2)
-                   ),
-                   deparse(
-                     function(prm){
-                       do.call(
-                         function(p1, p2, p3){
-                           p1 + p2 + p3/p2
-                         },
-                         as.list(prm[c(1, 3, 2)])
-                       )
-                     }
-                   )
-  )
+test_that("prm_add_transform",{
+
+  prm_tbl <- tibble::tibble(pname = c("p1", "p3", "p2"))
+
+  expect_identical(
+    parametR::ptrans_create(p1~p1+p2+p3/p2, prm_tbl),
+    function(prm){
+      do.call(
+        function(p1, p2, p3){
+          p1 + p2 + p3/p2
+          },
+        as.list(prm[c(1, 2, 3)])
+      )
+      },
+    ignore_function_env = TRUE
+    )
 })
 
 
