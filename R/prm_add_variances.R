@@ -34,7 +34,14 @@ prm_add_variances <- function(prm_tbl,
     unite(all, everything(), sep = ";") %>%
     pull(all)
 
-  output <- tibble(pname = pname)
+  output <- prm_create(pname = pname,
+                       pfile = "",
+                       pmin = pmin,
+                       pmax = pmax,
+                       pmu = pmu,
+                       psigma = psigma,
+                       pdist = pdist,
+                       pnum = max(prm_tbl$pnum)+(1:length(pname)))
 
   return(output)
 }

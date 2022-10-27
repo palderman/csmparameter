@@ -27,20 +27,58 @@ ptrans_fun <- function(arg_list, body, pind){
 #' @export
 #'
 #' @importFrom tibble tibble
-#' @importFrom dplyr right_join n
+#' @importFrom dplyr right_join n filter mutate ungroup full_join
+#' @importFrom purrr map map_chr
 #'
 prm_add_transform <- function(prm_tbl, ptrans, ...){
-  pname <- all.vars(ptrans[[2]])
-  arg_list <- all.vars(ptrans[[3]])
-  ptrans_tbl <- tibble(pname = arg_list, ...)
-  pind <- prm_tbl %>%
+
+  if(!is.expression(ptrans)) ptrans <- as.expression(ptrans)
+
+  prm_tbl <- prm_tbl %>%
     ungroup() %>%
-    mutate(pnum = 1:n()) %>%
-    {suppressMessages(right_join(., ptrans_tbl))} %>%
+    mutate(pnum = 1:n())
+
+  fun_list <- map(ptrans, function(ptr){
+    pname <- ptr %>%
+      getElement(2) %>%
+      all.vars()
+
+    arg_list <- ptr %>%
+      getElement(3) %>%
+      all.vars()
+
+    ptrans_tbl <- tibble(pname = arg_list, ...)
+
+    pind <- prm_tbl %>%
+      {suppressMessages(right_join(., ptrans_tbl))} %>%
+      pull(pnum)
+
+    body <- ptr %>%
+      getElement(3) %>%
+      deparse()
+
+    fun <- ptrans_fun(arg_list, body, pind)
+
+    return(fun)
+  })
+
+  if(! "ptrans" %in% colnames(prm_tbl)){
+    prm_tbl <- prm_tbl %>%
+      mutate(ptrans = vector("list", n()))
+  }
+  ptrans_ind <- tibble(
+      pname = map_chr(ptrans, ~{
+        pname <- .x %>%
+          getElement(2) %>%
+          all.vars()
+        }),
+      pt_ind = 1:length(ptrans),
+      ...) %>%
+    full_join(prm_tbl, .) %>%
+    filter(!is.na(pt_ind)) %>%
     pull(pnum)
-  body <- deparse(ptrans[[3]])
-  fun <- ptrans_fun(arg_list, body, pind)
-  new_tbl <- tibble(pname = pname, ptrans = list(fun)) %>%
-    full_join(prm_tbl, ., by = pname)
-  return(new_tbl)
+
+  prm_tbl$ptrans[ptrans_ind] <- fun_list
+
+  return(prm_tbl)
 }
