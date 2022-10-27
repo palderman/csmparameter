@@ -26,10 +26,21 @@ ptrans_fun <- function(arg_list, body, pind){
 #'
 #' @export
 #'
-ptrans_create <- function(pnames, expr){
-  arg_list <- all.vars(substitute(expr))
-  body <- deparse(substitute(expr))
-  pind <- match(arg_list, pnames)
+#' @importFrom tibble tibble
+#' @importFrom dplyr right_join n
+#'
+prm_add_transform <- function(prm_tbl, ptrans, ...){
+  pname <- all.vars(ptrans[[2]])
+  arg_list <- all.vars(ptrans[[3]])
+  ptrans_tbl <- tibble(pname = arg_list, ...)
+  pind <- prm_tbl %>%
+    ungroup() %>%
+    mutate(pnum = 1:n()) %>%
+    {suppressMessages(right_join(., ptrans_tbl))} %>%
+    pull(pnum)
+  body <- deparse(ptrans[[3]])
   fun <- ptrans_fun(arg_list, body, pind)
-  return(fun)
+  new_tbl <- tibble(pname = pname, ptrans = list(fun)) %>%
+    full_join(prm_tbl, ., by = pname)
+  return(new_tbl)
 }
