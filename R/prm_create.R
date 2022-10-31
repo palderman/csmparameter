@@ -40,6 +40,11 @@ prm_create <- function(pname, pfile,
                                              pmax = pmax,
                                              pmu = pmu,
                                              psigma = psigma,
+                                             pdist = pdist)),
+           psampler = list(prm_prior_sampler(pmin = pmin,
+                                             pmax = pmax,
+                                             pmu = pmu,
+                                             psigma = psigma,
                                              pdist = pdist))) %>%
     ungroup() %>%
     select(-pmin, -pmax, -pmu, -psigma, -pdist) %>%

@@ -43,6 +43,15 @@ test_that("single parameter full specification", {
                        pdist = "normal"
                      )),
                      ignore_function_env = TRUE)
+    expect_identical(getElement(actual, "psampler"),
+                     list(parametR:::prm_prior_sampler(
+                       pmin = 16,
+                       pmax = 36,
+                       pmu = 25,
+                       psigma = 5,
+                       pdist = "normal"
+                     )),
+                     ignore_function_env = TRUE)
 
 })
 
@@ -97,6 +106,28 @@ test_that("three parameter full specification", {
                        psigma = 11,
                        pdist = "normal"),
                      parametR:::prm_prior_density(
+                       pmin = 0.5,
+                       pmax = 23,
+                       pmu = 3.8,
+                       psigma = 6.2,
+                       pdist = "normal")
+                   ),
+                   ignore_function_env = TRUE)
+  expect_identical(getElement(actual, "psampler"),
+                   list(
+                     parametR:::prm_prior_sampler(
+                       pmin = 16,
+                       pmax = 36,
+                       pmu = 25,
+                       psigma = 5,
+                       pdist = "normal"),
+                     parametR:::prm_prior_sampler(
+                       pmin = 1.2,
+                       pmax = 43,
+                       pmu = 32,
+                       psigma = 11,
+                       pdist = "normal"),
+                     parametR:::prm_prior_sampler(
                        pmin = 0.5,
                        pmax = 23,
                        pmu = 3.8,

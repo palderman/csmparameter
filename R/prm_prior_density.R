@@ -1,3 +1,15 @@
+check_pdist <- function(pdist, pdist_options = c("normal", "uniform")){
+  if(!pdist %in% pdist_options){
+    stop(
+      paste0("pdist value is not recognized: ", pdist,
+         ". Should be one of: ",
+         paste(pdist_options, collapse = ", "))
+      )
+  }else{
+    return(TRUE)
+  }
+}
+
 # Function for creating local constants for prior density function
 value_to_code <- function(name, val) paste0(name, " <- ",
                                         deparse(val, control = c("all", "hexNumeric")))
@@ -76,14 +88,12 @@ uniform_prior_density <- function(pmin, pmax){
 #'
 prm_prior_density <- function(pmin, pmax, pmu, psigma, pdist){
 
+  check_pdist(pdist)
+
   if(pdist == "uniform"){
     prior_density <- uniform_prior_density(pmin, pmax)
   }else if(pdist == "normal"){
     prior_density <- normal_prior_density(pmin, pmax, pmu, psigma)
-  }else{
-    paste0("pdist value is not recognized: ", pdist,
-           ". Should be one of: uniform, normal") %>%
-    stop()
   }
 
   return(prior_density)
