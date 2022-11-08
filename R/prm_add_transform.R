@@ -27,10 +27,11 @@ ptrans_fun <- function(arg_list, body, pind){
 #' @export
 #'
 #' @importFrom tibble tibble
-#' @importFrom dplyr right_join n filter mutate ungroup full_join
+#' @importFrom dplyr right_join n filter mutate ungroup
+#'   full_join arrange
 #' @importFrom purrr map map_chr
 #'
-prm_add_transform <- function(prm_tbl, ptrans, ...){
+prm_add_transform <- function(prm_tbl, ptrans, pfile = "", ...){
 
   if(!is.expression(ptrans)) ptrans <- as.expression(ptrans)
 
@@ -39,6 +40,7 @@ prm_add_transform <- function(prm_tbl, ptrans, ...){
     mutate(pnum = 1:n())
 
   fun_list <- map(ptrans, function(ptr){
+
     pname <- ptr %>%
       getElement(2) %>%
       all.vars()
@@ -56,10 +58,13 @@ prm_add_transform <- function(prm_tbl, ptrans, ...){
         stop()
     }
 
-    ptrans_tbl <- tibble(pname = arg_list, ...)
+    ptrans_tbl <- tibble(pname = arg_list,
+                         arg_num = 1:length(arg_list),
+                         ...)
 
     pind <- prm_tbl %>%
       {suppressMessages(right_join(., ptrans_tbl))} %>%
+      arrange(arg_num) %>%
       pull(pnum)
 
     # if(pname %in% arg_list){
@@ -84,14 +89,17 @@ prm_add_transform <- function(prm_tbl, ptrans, ...){
       mutate(ptransform = vector("list", n()))
   }
 
+  # Add any transformed parameters to prm_tbl that are not
+  #  already present
   prm_tbl <- tibble(pname = map_chr(ptrans,~{
     .x %>%
       getElement(2) %>%
       all.vars()
       })) %>%
-    full_join(prm_tbl, .) %>%
+    {suppressMessages(full_join(prm_tbl, .))} %>%
     arrange(pnum)
 
+  # Find row index for transformed parameters in prm_tbl
   ptrans_ind <- tibble(
       pname = map_chr(ptrans, ~{
         pname <- .x %>%
@@ -100,14 +108,21 @@ prm_add_transform <- function(prm_tbl, ptrans, ...){
         }),
       pt_ind = 1:length(ptrans),
       ...) %>%
-    full_join(prm_tbl, .) %>%
+    {suppressMessages(full_join(prm_tbl, .))} %>%
+    mutate(pnum_tmp = 1:n()) %>%
     filter(!is.na(pt_ind)) %>%
-    pull(pnum)
+    pull(pnum_tmp)
 
+  # Add pfile to corresponding rows
+  prm_tbl$pfile[ptrans_ind] <- pfile
+
+  # Add transform functions to corresponding rows
   prm_tbl$ptransform[ptrans_ind] <- fun_list
 
+  # nullify density functions for transformed parameters
   prm_tbl$pdensity[ptrans_ind] <- rep(list(NULL), length(ptrans_ind))
 
+  # nullify prior sample functions for transformed parameters
   prm_tbl$psampler[ptrans_ind] <- rep(list(NULL), length(ptrans_ind))
 
   return(prm_tbl)
