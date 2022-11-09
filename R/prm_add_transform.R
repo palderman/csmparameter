@@ -67,24 +67,16 @@ prm_add_transform <- function(prm_tbl, ptrans, pfile = "", ...){
       arrange(arg_num) %>%
       pull(pnum)
 
-    # if(pname %in% arg_list){
-    #   body <- ptr %>%
-    #     getElement(3) %>%
-    #     list(list(str_c(pname, "_latent"))) %>%
-    #     setNames(pname) %>%
-    #     do.call(substitute, .)
-    # }else{
     body <- ptr %>%
       getElement(3) %>%
       deparse()
-    # }
 
     fun <- ptrans_fun(arg_list, body, pind)
 
     return(fun)
   })
 
-  if(! "ptrans" %in% colnames(prm_tbl)){
+  if(! "ptransform" %in% colnames(prm_tbl)){
     prm_tbl <- prm_tbl %>%
       mutate(ptransform = vector("list", n()))
   }
