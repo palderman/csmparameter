@@ -39,7 +39,7 @@ prm_add_transform <- function(prm_tbl, ptrans, pfile = "", ...){
     ungroup() %>%
     mutate(pnum = 1:n())
 
-  fun_list <- map(ptrans, function(ptr){
+  fun_list <- map(as.list(ptrans), function(ptr){
 
     pname <- ptr %>%
       getElement(2) %>%
@@ -83,7 +83,7 @@ prm_add_transform <- function(prm_tbl, ptrans, pfile = "", ...){
 
   # Add any transformed parameters to prm_tbl that are not
   #  already present
-  prm_tbl <- tibble(pname = map_chr(ptrans,~{
+  prm_tbl <- tibble(pname = map_chr(as.list(ptrans),~{
     .x %>%
       getElement(2) %>%
       all.vars()
@@ -93,7 +93,7 @@ prm_add_transform <- function(prm_tbl, ptrans, pfile = "", ...){
 
   # Find row index for transformed parameters in prm_tbl
   ptrans_ind <- tibble(
-      pname = map_chr(ptrans, ~{
+      pname = map_chr(as.list(ptrans), ~{
         pname <- .x %>%
           getElement(2) %>%
           all.vars()

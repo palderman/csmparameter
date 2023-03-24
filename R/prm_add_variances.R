@@ -6,7 +6,6 @@
 #' @importFrom dplyr summarize mutate pull bind_rows bind_cols full_join
 #'   group_by groups
 #' @importFrom tidyr pivot_longer pivot_wider unite unnest
-#' @importFrom purrr map_chr
 #' @importFrom stringr str_c
 #' @importFrom tibble tibble
 #' @importFrom lubridate is.POSIXt
