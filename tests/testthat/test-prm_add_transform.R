@@ -10,9 +10,10 @@ test_that("ptrans_internal",{
 
 test_that("prm_add_transform with latent",{
 
-  expected <- tibble::tibble(
+  expected <- data.frame(
     pname = c("p1_latent", "p2", "p3", "p1"),
-    pfile = ""
+    pfile = "",
+    stringsAsFactors = FALSE
     )
 
   expected$pdensity <- lapply(1:4,

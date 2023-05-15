@@ -4,7 +4,7 @@
 \alias{prm_add_transform}
 \title{Create a parameter transformation}
 \usage{
-prm_add_transform(prm_tbl, ptrans, pfile = "", ...)
+prm_add_transform(prm_df, ptrans, pfile = "", ...)
 }
 \description{
 Create a parameter transformation
