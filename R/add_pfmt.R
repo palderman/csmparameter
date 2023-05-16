@@ -10,9 +10,14 @@ add_pfmt <- function(.prm_tbl, input_tbl){
 
   names(v_fmt) <- input_tbl$file_name
 
-  .prm_tbl <- .prm_tbl %>%
-    rowwise() %>%
-    mutate(pfmt = v_fmt[[pfile]][pname])
+  .prm_tbl$pfmt <- NA_character_
+
+  for(i in 1:nrow(.prm_tbl)){
+    if(.prm_tbl$pfile[i] != ""){
+      .prm_tbl$pfmt[i] <- with(.prm_tbl[i,],
+                               v_fmt[[pfile]][pname])
+    }
+  }
 
   return(.prm_tbl)
 
