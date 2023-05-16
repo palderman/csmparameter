@@ -11,9 +11,7 @@ add_pregex <- function(.prm_tbl){
     str_remove('-') %>%
     as.numeric()
 
-  .prm_tbl <- .prm_tbl %>%
-    ungroup() %>%
-    mutate(pregex = generate_pregex(widths))
+  .prm_tbl$pregex <- generate_pregex(widths)
 
   return(.prm_tbl)
 
