@@ -24,9 +24,9 @@ generate_pregex <- function(widths){
                                            widths[!is.na(widths)])
     found = FALSE
     for(j in 1:length(pregex)){
-      if(!found){
+      if(!found & !is.na(pregex[j])){
         found = any(grepl(pregex[j], pregex[-j]))
-      }else{
+      }else if(!is.na(pregex[j])){
         break
       }
     }
