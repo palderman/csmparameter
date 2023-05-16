@@ -5,7 +5,7 @@
 #'
 #' @export
 #'
-write_dssbatch.dssat_expmt_tbl <- function(expmt_tbl){
+write_dssbatch.expmt_tbl <- function(expmt_tbl){
 
   expmt_tbl %>%
     select(filex_name,trno) %>%

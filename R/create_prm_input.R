@@ -36,7 +36,7 @@ create_prm_input <- function(file_path, ...){
     file_processed <- read_eco(file_path, ...)
   }
 
-  input_tbl <- as_dssat_input_tbl(
+  input_tbl <- as_prm_input_tbl(
     data.frame(file_name = file_name, file_processed = list(file_processed))
     )
 

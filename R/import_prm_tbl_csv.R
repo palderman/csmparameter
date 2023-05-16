@@ -104,19 +104,19 @@ import_prm_tbl_csv <- function(file_name){
     pwt <- NULL
   }
 
-  prm_tbl <- create_dssat_prm(pname = pname,
-                              pfile = pfile,
-                              pmin = pmin,
-                              pmax = pmax,
-                              pmu = pmu,
-                              psigma = psigma,
-                              pdist = pdist,
-                              ptier = ptier,
-                              pkey = pkey,
-                              plev = plev,
-                              pind = pind,
-                              pnum = pnum,
-                              pwt = pwt)
+  prm_tbl <- prm_create(pname = pname,
+                        pfile = pfile,
+                        pmin = pmin,
+                        pmax = pmax,
+                        pmu = pmu,
+                        psigma = psigma,
+                        pdist = pdist,
+                        ptier = ptier,
+                        pkey = pkey,
+                        plev = plev,
+                        pind = pind,
+                        pnum = pnum,
+                        pwt = pwt)
 
   return(prm_tbl)
 

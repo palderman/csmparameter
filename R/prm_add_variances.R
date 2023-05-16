@@ -10,7 +10,7 @@
 #' @importFrom tibble tibble
 #' @importFrom lubridate is.POSIXt
 #'
-#' @param obs_tbl a tibble as produced by the create_dssat_expmt()
+#' @param obs_tbl a tibble as produced by the create_expmt()
 #'  function grouped by the factors which identify the observation
 #'  groups for which a variance term should be estimated
 #'

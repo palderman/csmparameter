@@ -48,7 +48,7 @@ prm_create <- function(pname, pfile,
                                              pdist = pdist))) %>%
     ungroup() %>%
     select(-pmin, -pmax, -pmu, -psigma, -pdist) %>%
-    as_dssat_prm_tbl()
+    as_prm_tbl()
 
   return(prm)
 

@@ -15,10 +15,10 @@ create_expmt_tbl <- function(filex_name, trno=NULL, data_types=NULL,
   }
   expmt_tbl <- filex_trno_tbl %>%
     group_by(filex_name) %>%
-    group_map(~create_dssat_expmt(filex_name = .y$filex_name,
-                                  trno = .x$trno[[1]],
-                                  data_types = data_types,
-                                  rewrite_filex = rewrite_filex)) %>%
+    group_map(~create_expmt(filex_name = .y$filex_name,
+                            trno = .x$trno[[1]],
+                            data_types = data_types,
+                            rewrite_filex = rewrite_filex)) %>%
     bind_rows()
   return(expmt_tbl)
 }

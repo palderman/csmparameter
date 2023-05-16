@@ -6,7 +6,7 @@
 #' @importFrom tibble tibble
 #' @importFrom tidyr pivot_longer
 #'
-create_dssat_expmt <- function(filex_name, trno=NULL, data_types=NULL,
+create_expmt <- function(filex_name, trno=NULL, data_types=NULL,
                                rewrite_filex = FALSE){
 
   if(is.null(trno)){
@@ -92,7 +92,7 @@ create_dssat_expmt <- function(filex_name, trno=NULL, data_types=NULL,
                   obs_tbl = list(joined_data), trno = list(trno),
                   data_types = list(data_types), sim_template = list(sim_template)) %>%
     add_output_tbl() %>%
-    as_dssat_expmt_tbl()
+    as_expmt_tbl()
 
   return(expmt)
 
