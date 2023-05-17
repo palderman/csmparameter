@@ -1,6 +1,6 @@
 #' @export
 #'
-as_orm_expmt_tbl <- function(tbl_in){
+as_prm_expmt_tbl <- function(tbl_in){
   UseMethod("as_prm_expmt_tbl")
 }
 
