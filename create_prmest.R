@@ -3,7 +3,7 @@
 #' @importFrom dplyr "%>%"
 #' @importFrom stringr str_c
 #'
-construct_prmest <- function(expmt_tbl, input_tbl,
+create_prmest <- function(expmt_tbl, input_tbl,
                              prm_tbl, stat_fun, dssat_call){
 
   if(missing(dssat_call)){
