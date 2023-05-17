@@ -5,21 +5,30 @@
 #'
 find_output_variables <- function(.expmt){
 
-  raw_out_files <- list.files(pattern = '\\.OUT') %>%
+  raw_out_files <- list.files(pattern = '(\\.OUT)|(\\.csv)') %>%
     {c('Summary.OUT','PlantGro.OUT',.)} %>%
     unique() %>%
     str_subset("Measured", negate = TRUE) %>%
     setNames(.,.) %>%
-    map(~readLines(.))
+    map(function(.x) if(file.exists(.x)) readLines(.x) else NULL)
 
   data_type_regex <- .expmt$data_types %>%
     unlist() %>%
     str_c("(", ., ")") %>%
     str_c(collapse = "|")
 
-  out_tbl <- raw_out_files %>%
-    map_lgl(~any(str_detect(., "^ *@") &
-                   str_detect(., data_type_regex))) %>%
+  headers <- vector(mode = "list", length = length(raw_out_files))
+  for(i in seq_along(headers)){
+    if(grepl("\\.csv$", names(raw_out_files)[i])){
+      headers[[i]] <- raw_out_files[[i]][1]
+    }else{
+      headers[[i]] <- grep("^ *@", raw_out_files[[i]], value = TRUE)
+    }
+  }
+  names(headers) <- names(raw_out_files)
+
+  out_tbl <- headers %>%
+    map_lgl(~any(str_detect(., data_type_regex))) %>%
     subset(raw_out_files, .) %>%
     names() %>%
     setNames(.,.) %>%

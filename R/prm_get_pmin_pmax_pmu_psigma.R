@@ -13,13 +13,13 @@ prm_get_pvar <- function(pdensity, regex){
           lapply(pdensity, deparse),
           # subset to line in text that contanins regex
           function(.x) grep(regex, .x, value = TRUE)
-          ),
+        ),
         # Remove variable name and assignment operator
         function(.x) gsub(".*<-", "", .x)
-        ),
+      ),
       # Convert text value into numeric
       function(.x) if(length(.x) == 0) NA_real_ else as.numeric(.x)
-      )
+    )
   )
 
 }
