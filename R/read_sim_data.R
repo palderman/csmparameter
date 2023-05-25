@@ -48,7 +48,7 @@ read_sim_data <- function(run_tbl){
           rename_with(~str_replace(.,'RUNNO','RUN')) %>%
           select(-matches("(EXPERIMENT)|(MODEL)")) %>%
           full_join(run_expmt) %>%
-          select(any_of(c("EXPERIMENT", "TRNO", all_cols))) %>%
+          select(any_of(c("EXPERIMENT", "TRNO", "DATE", all_cols))) %>%
           pivot_longer(names_to = "variable",
                        values_to = "sim",
                        cols = any_of(all_cols))
