@@ -86,7 +86,7 @@ uniform_prior_density <- function(pmin, pmax){
 #'
 #' @importFrom magrittr "%>%"
 #'
-prm_prior_density <- function(pmin, pmax, pmu, psigma, pdist){
+prm_prior_density_function <- function(pmin, pmax, pmu, psigma, pdist){
 
   check_pdist(pdist)
 

@@ -56,7 +56,7 @@ normal_prior_sampler <- function(pmin, pmax, pmu, psigma){
 #'
 #' @importFrom magrittr "%>%"
 #'
-prm_prior_sampler <- function(pmin, pmax, pmu, psigma, pdist){
+prm_prior_sampler_function <- function(pmin, pmax, pmu, psigma, pdist){
 
   check_pdist(pdist)
 

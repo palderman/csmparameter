@@ -36,16 +36,16 @@ prm_create <- function(pname, pfile,
                 pind = pind, pnum = pnum) %>%
     mutate(across(c(ptier, pkey), as.character)) %>%
     rowwise() %>%
-    mutate(pdensity = list(prm_prior_density(pmin = pmin,
-                                             pmax = pmax,
-                                             pmu = pmu,
-                                             psigma = psigma,
-                                             pdist = pdist)),
-           psampler = list(prm_prior_sampler(pmin = pmin,
-                                             pmax = pmax,
-                                             pmu = pmu,
-                                             psigma = psigma,
-                                             pdist = pdist))) %>%
+    mutate(pdensity = list(prm_prior_density_function(pmin = pmin,
+                                                      pmax = pmax,
+                                                      pmu = pmu,
+                                                      psigma = psigma,
+                                                      pdist = pdist)),
+           psampler = list(prm_prior_sampler_function(pmin = pmin,
+                                                     pmax = pmax,
+                                                     pmu = pmu,
+                                                     psigma = psigma,
+                                                     pdist = pdist))) %>%
     ungroup() %>%
     select(-pmin, -pmax, -pmu, -psigma, -pdist) %>%
     as_prm_tbl()
