@@ -1,7 +1,7 @@
 #'
 #' @export
 #'
-prm_sample <- function(prm_tbl, size = 1){
+prm_prior_sample <- function(prm_tbl, size = 1){
 
   smpl_list <- lapply(prm_tbl$psampler,
                       function(.x) if(is.null(.x)) NA_real_ else .x(size))
