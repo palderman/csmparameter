@@ -1,4 +1,4 @@
-Package: parametR
+Package: csmparameter
 Type: Package
 Title: Parameter sensitivity analysis and estimation for the DSSAT-CSM
 Version: 0.0.0.9000

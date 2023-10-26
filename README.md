@@ -1,4 +1,4 @@
-# parametR
+# csmparameter
 
 The purpose of this package is to provide parameter sensitivity analysis and estimation capability for the Decision Support System for Agrotechnology Transfer Cropping Systems Model (DSSAT-CSM). The initial goal for the package will be to provide cross-platform functions for:
 
