@@ -2,8 +2,8 @@
 #'
 generate_prm_replace <- function(pvals,.prm_tbl){
 
-  # prm_vals <- .prm_tbl %>%
-  #   mutate(prm_vals = pvals[pnum]*pwt) %>%
+  # prm_vals <- .prm_tbl |>
+  #   mutate(prm_vals = pvals[pnum]*pwt) |>
   #   pull(prm_vals)
 
   not_latent <- !is.na(.prm_tbl$pfmt)

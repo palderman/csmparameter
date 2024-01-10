@@ -4,10 +4,10 @@
 \alias{run_DEoptim_estimation}
 \title{Use the DEoptim package to perform global parameter optimization}
 \usage{
-run_DEoptim_estimation(prmest, control = DEoptim::DEoptim.control())
+run_DEoptim_estimation(prm_est, control = DEoptim::DEoptim.control())
 }
 \arguments{
-\item{prmest}{a named list created using \link{create_prmest}}
+\item{prm_est}{a named list created using \link{create_prm_est}}
 
 \item{control}{a named list created using \link[DEoptim]{DEoptim.control}() from the
 DEoptim package (See \link[DEoptim]{DEoptim.control} for details)}

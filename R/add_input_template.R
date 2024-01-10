@@ -1,15 +1,15 @@
 #' @export
 #'
-#' @importFrom dplyr "%>%" filter group_by group_modify mutate ungroup select
+#' @importFrom dplyr  filter group_by group_modify mutate ungroup select
 #' @importFrom stringr str_replace_all str_detect
 #' @importFrom DSSAT mutate_cond
 #'
 add_input_template <- function(.input_tbl,.prm_tbl){
 
-  .input_tbl <- .input_tbl %>%
-    group_by(file_name) %>%
+  .input_tbl <- .input_tbl |>
+    group_by(file_name) |>
     group_modify(~{
-      pt <- filter(.prm_tbl, pfile == .y$file_name) %>%
+      pt <- filter(.prm_tbl, pfile == .y$file_name) |>
         mutate(pfmt = str_replace_all(pfmt,'(\\..*)|([a-z])','s'))
       if(nrow(pt) > 0){
         fp <- .x$file_processed[[1]]
@@ -25,9 +25,9 @@ add_input_template <- function(.input_tbl,.prm_tbl){
         .x$file_processed[[1]] <- fp
       }
       return(.x)
-    }) %>%
-    mutate(file_template = generate_file_template(file_name,file_processed[[1]])) %>%
-    ungroup() %>%
+    }) |>
+    mutate(file_template = generate_file_template(file_name,file_processed[[1]])) |>
+    ungroup() |>
     select(-file_processed)
 
   return(.input_tbl)

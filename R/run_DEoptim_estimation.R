@@ -2,28 +2,28 @@
 #'
 #' @export
 #'
-#' @param prmest a named list created using [create_prmest]
+#' @param prm_est a named list created using [create_prm_est]
 #'
 #' @param control a named list created using \link[DEoptim]{DEoptim.control}() from the
 #'  DEoptim package (See \link[DEoptim]{DEoptim.control} for details)
 #'
-run_DEoptim_estimation <- function(prmest, control=DEoptim::DEoptim.control()){
+run_DEoptim_estimation <- function(prm_est, control=DEoptim::DEoptim.control()){
 
   if(!requireNamespace("DEoptim")){
     stop("run_DEoptim_estimation() requires the DEoptim package. Please install it and try again.")
   }
 
-  if("pmin" %in% colnames(prmest$prm_tbl)){
-    lower <- prmest$prm_tbl$pmin
+  if("pmin" %in% colnames(prm_est$prm_tbl)){
+    lower <- prm_est$prm_tbl$pmin
   }else{
-    lower <- prm_get_pmin(prmest$prm_tbl$pdensity)
+    lower <- prm_get_pmin(prm_est$prm_tbl$pdensity)
   }
   lower <- lower[!is.na(lower)]
 
-  if("pmax" %in% colnames(prmest$prm_tbl)){
-    upper <- prmest$prm_tbl$pmax
+  if("pmax" %in% colnames(prm_est$prm_tbl)){
+    upper <- prm_est$prm_tbl$pmax
   }else{
-    upper <- prm_get_pmax(prmest$prm_tbl$pdensity)
+    upper <- prm_get_pmax(prm_est$prm_tbl$pdensity)
   }
   upper <- upper[!is.na(upper)]
 
@@ -33,14 +33,14 @@ run_DEoptim_estimation <- function(prmest, control=DEoptim::DEoptim.control()){
     }else{
       NP <- control$NP
     }
-    control$initialpop <- prm_sample_prior(prmest$prm_tbl, n = NP)
+    control$initialpop <- prm_sample_prior(prm_est$prm_tbl, n = NP)
   }
 
   est_out <- DEoptim::DEoptim(fn = est_obj_fun,
                               lower = lower,
                               upper = upper,
                               control = control,
-                              prmest = prmest)
+                              prm_est = prm_est)
 
   return(est_out)
 

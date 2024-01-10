@@ -1,5 +1,5 @@
 #'
-#' @importFrom dplyr "%>%" select
+#' @importFrom dplyr  select
 #' @importFrom tidyr unnest
 #' @importFrom DSSAT write_dssbatch
 #'
@@ -7,9 +7,10 @@
 #'
 write_dssbatch.expmt_tbl <- function(expmt_tbl){
 
-  expmt_tbl %>%
-    select(filex_name,trno) %>%
-    unnest(trno) %>%
-    {write_dssbatch(x = .$filex_name, trtno = .$trno)}
+  expmt_tbl |>
+    select(filex_name,trno) |>
+    unnest(trno) |>
+    (\(.x) write_dssbatch(x = .x$filex_name, trtno = .x$trno)
+     )()
 
 }

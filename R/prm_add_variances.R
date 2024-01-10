@@ -2,7 +2,6 @@
 #'
 #' @export
 #'
-#' @importFrom magrittr "%>%"
 #' @importFrom dplyr summarize mutate pull bind_rows bind_cols full_join
 #'   group_by groups
 #' @importFrom tidyr pivot_longer pivot_wider unite unnest
@@ -28,35 +27,37 @@ prm_add_variances <- function(prm_tbl,
                     pmu = pmu,
                     psigma = psigma,
                     pdist = pdist,
-                    ...) %>%
+                    ...) |>
     # Join prior data with obs_tbl and suppress message
-    {suppressMessages(full_join(., obs_tbl))} %>%
-    # Impose grouping structur from obs_tbl on var_tbl
-    {do.call(group_by, c(list(.), groups(obs_tbl)))} %>%
+    (\(.x) suppressMessages(full_join(.x, obs_tbl))
+     )() |>
+    # Impose grouping structure from obs_tbl on var_tbl
+    (\(.x) do.call(group_by, c(list(.x), groups(obs_tbl)))
+     )() |>
     summarize(across(c(pmin, pmax, pmu, psigma, pdist), unique))
 
-  var_tbl <- obs_tbl %>%
+  var_tbl <- obs_tbl |>
     # Drop non-grouping variables
-    summarize() %>%
-    ungroup() %>%
+    summarize() |>
+    ungroup() |>
     # Convert all grouping variables to character
     mutate(across(where(is.POSIXt), ~format(., "%Y-%j")),
-           across(where(~{!is.character(.)}), as.character)) %>%
+           across(where(~{!is.character(.)}), as.character)) |>
     # Stack all grouping variables
-    pivot_longer(everything()) %>%
+    pivot_longer(everything()) |>
     # Append variable name to value
-    mutate(value = str_c(name, value, sep = ":")) %>%
+    mutate(value = str_c(name, value, sep = ":")) |>
     # Unstack appended grouping variables
-    pivot_wider(values_fn = list) %>%
-    unnest(everything()) %>%
+    pivot_wider(values_fn = list) |>
+    unnest(everything()) |>
     # Unite grouping variables into single pname column
-    unite(pname, everything(), sep = ";") %>%
+    unite(pname, everything(), sep = ";") |>
     # Prepend pname with variance label
-    mutate(pname = str_c("variance;", pname)) %>%
+    mutate(pname = str_c("variance;", pname)) |>
     # Combine with tibble with prior information
     bind_cols(prior_tbl)
 
-  output <- var_tbl %>%
+  output <- var_tbl |>
     # Create parameter table for variance parameters
     with(prm_create(pname = pname,
                     pfile = "",
@@ -65,9 +66,10 @@ prm_add_variances <- function(prm_tbl,
                     pmu = pmu,
                     psigma = psigma,
                     pdist = pdist,
-                    pnum = max(prm_tbl$pnum)+(1:length(pname)))) %>%
+                    pnum = max(prm_tbl$pnum)+(1:length(pname)))) |>
     # Combine variance parameter table with original prm_tbl
-    bind_rows(prm_tbl, .)
+    (\(.x) bind_rows(prm_tbl, .x)
+     )()
 
   return(output)
 }

@@ -1,6 +1,3 @@
-#'
-#' @importFrom magrittr "%>%"
-#'
 uniform_prior_sampler <- function(pmin, pmax){
 
   if(is.na(pmin) || is.null(pmin)) pmin <- -.Machine$double.xmax
@@ -15,17 +12,15 @@ uniform_prior_sampler <- function(pmin, pmax){
     #
     "pval <- exp(log(pnorm(rnorm(n)))+log(pmax - pmin))+pmin",
     "return(pval)",
-    "}") %>%
-    parse(text =.) %>%
+    "}") |>
+    (\(.x) parse(text =.x)
+     )() |>
     eval()
 
   return(prior_sampler_fun)
 
 }
 
-#'
-#' @importFrom magrittr "%>%"
-#'
 normal_prior_sampler <- function(pmin, pmax, pmu, psigma){
 
   if(is.na(pmin) || is.null(pmin)) pmin <- -Inf
@@ -44,8 +39,9 @@ normal_prior_sampler <- function(pmin, pmax, pmu, psigma){
     "prob_pval <- exp(log(pnorm(rnorm(n)))+log(prob_max - prob_min)) + prob_min",
     "pval <- qnorm(prob_pval, mean = pmu, sd = psigma)",
     "return(pval)",
-    "}") %>%
-    parse(text =.) %>%
+    "}") |>
+    (\(.x) parse(text =.x)
+     )() |>
     eval()
 
   return(prior_sampler_fun)
@@ -53,8 +49,6 @@ normal_prior_sampler <- function(pmin, pmax, pmu, psigma){
 }
 
 #' @export
-#'
-#' @importFrom magrittr "%>%"
 #'
 prm_prior_sampler_function <- function(pmin, pmax, pmu, psigma, pdist){
 

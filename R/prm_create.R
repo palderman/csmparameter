@@ -1,5 +1,5 @@
 #'
-#' @importFrom dplyr "%>%" rowwise mutate ungroup select
+#' @importFrom dplyr  rowwise mutate ungroup select
 #' @importFrom tibble tibble
 #'
 #' @export
@@ -14,6 +14,7 @@ prm_create <- function(pname, pfile,
                        pkey = as.character(NA),
                        plev = as.integer(NA),
                        pind = as.integer(NA),
+                       pfmt = as.character(NA),
                        pnum = NULL,
                        pwt = NULL){
 
@@ -31,11 +32,12 @@ prm_create <- function(pname, pfile,
   if(all(is.null(pind))) pind = as.numeric(NA)
   if(all(is.null(pnum))) pnum = 1:length(pname)
 
-  prm <- tibble(pname = pname, pmin = pmin, pmax = pmax, pmu = pmu, psigma = psigma,
-                pdist = pdist, pfile = pfile, ptier = ptier, pkey = pkey, plev = plev,
-                pind = pind, pnum = pnum) %>%
-    mutate(across(c(ptier, pkey), as.character)) %>%
-    rowwise() %>%
+  prm <- data.frame(pname = pname, pmin = pmin, pmax = pmax, pmu = pmu,
+                    psigma = psigma, pdist = pdist, pfile = pfile,
+                    ptier = ptier, pkey = pkey, plev = plev, pind = pind,
+                    pnum = pnum, pfmt = pfmt) |>
+    mutate(across(c(ptier, pkey), as.character)) |>
+    rowwise() |>
     mutate(pdensity = list(prm_prior_density_function(pmin = pmin,
                                                       pmax = pmax,
                                                       pmu = pmu,
@@ -45,9 +47,11 @@ prm_create <- function(pname, pfile,
                                                      pmax = pmax,
                                                      pmu = pmu,
                                                      psigma = psigma,
-                                                     pdist = pdist))) %>%
-    ungroup() %>%
-    select(-pmin, -pmax, -pmu, -psigma, -pdist) %>%
+                                                     pdist = pdist)),
+           ptransform = list(NULL)) |>
+    ungroup() |>
+    select(-pmin, -pmax, -pmu, -psigma, -pdist) |>
+    add_pregex() |>
     as_prm_tbl()
 
   return(prm)

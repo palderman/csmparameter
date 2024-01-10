@@ -31,9 +31,6 @@ tnorm_test_vector <- function(pmin, pmax, pmu, psigma){
 
 }
 
-#'
-#' @importFrom magrittr "%>%"
-#'
 normal_prior_density <- function(pmin, pmax, pmu, psigma){
   if(is.na(pmin) || is.null(pmin)) pmin <- -Inf
   if(is.na(pmax) || is.null(pmax)) pmax <- Inf
@@ -49,17 +46,15 @@ normal_prior_density <- function(pmin, pmax, pmu, psigma){
     "dens_adj <- tnorm_dens_adj(pmin, pmax, pmu, psigma)",
     "lp <- dnorm(pval, mean = pmu, sd = psigma, log = TRUE) - dens_adj",
     "return(lp)",
-    "}") %>%
-    parse(text =.) %>%
+    "}") |>
+    (\(.x) parse(text =.x)
+     )() |>
     eval()
 
   return(prior_density_fun)
 
 }
 
-#'
-#' @importFrom magrittr "%>%"
-#'
 uniform_prior_density <- function(pmin, pmax){
 
   if(is.na(pmin) || is.null(pmin)) pmin <- -Inf
@@ -74,8 +69,9 @@ uniform_prior_density <- function(pmin, pmax){
     "if(pval <= pmin || pval >= pmax) return(-Inf)",
     "lp <- dunif(pval, min = pmin, max = pmax, log = TRUE)",
     "return(lp)",
-    "}") %>%
-    parse(text =.) %>%
+    "}") |>
+    (\(.x) parse(text =.x)
+     )() |>
     eval()
 
   return(prior_density_fun)
@@ -83,8 +79,6 @@ uniform_prior_density <- function(pmin, pmax){
 }
 
 #' @export
-#'
-#' @importFrom magrittr "%>%"
 #'
 prm_prior_density_function <- function(pmin, pmax, pmu, psigma, pdist){
 

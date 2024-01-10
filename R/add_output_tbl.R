@@ -1,4 +1,4 @@
-#' @importFrom dplyr "%>%" group_by mutate group_modify
+#' @importFrom dplyr  group_by mutate group_modify
 #' @importFrom DSSAT run_dssat
 #'
 add_output_tbl <- function(.expmt){
@@ -7,8 +7,8 @@ add_output_tbl <- function(.expmt){
 
   run_dssat(suppress_output = TRUE)
 
-  .expmt <- .expmt %>%
-    group_by(filex_name) %>%
+  .expmt <- .expmt |>
+    group_by(filex_name) |>
     group_modify(~mutate(.x,out_tbl = list(find_output_variables(.x))))
 
   return(.expmt)

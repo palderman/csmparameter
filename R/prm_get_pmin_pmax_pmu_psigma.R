@@ -1,5 +1,4 @@
 #'
-#' @importFrom magrittr "%>%"
 #' @importFrom purrr map map_dbl
 #' @importFrom stringr str_subset str_remove
 #'
