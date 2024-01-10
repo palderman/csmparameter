@@ -29,9 +29,11 @@ find_output_variables <- function(.expmt){
 
   out_tbl <- headers |>
     map_lgl(~any(str_detect(., data_type_regex))) |>
-    subset(raw_out_files, .) |>
+    (\(.x) subset(raw_out_files, .x)
+     )() |>
     names() |>
-    (\(.x) setNames(.x, .x))() |>
+    (\(.x) setNames(.x, .x)
+     )() |>
     map(~try(suppressWarnings(read_output(.)), silent = TRUE)) |>
     (\(.x) .x[map_lgl(.x, ~{ ! 'try-error' %in% class(.) })]
      )() |>

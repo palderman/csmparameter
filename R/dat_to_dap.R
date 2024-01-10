@@ -14,9 +14,11 @@ dat_to_dap <- function(pdate,.data){
     dat_cnames <- colnames(.data)[dat_cols]
     .data <- .data |>
       left_join(pdate) |>
-      mutate_if(.,
-                colnames(.) %in% dat_cnames,
-                ~{as.numeric(difftime(.,PDATE,units='days'))}) |>
+      (\(.x)
+      mutate_if(.x,
+                colnames(.x) %in% dat_cnames,
+                ~{as.numeric(difftime(., PDATE,units='days'))})
+      )() |>
       select(-PDATE)
 
     cnames <- colnames(.data)

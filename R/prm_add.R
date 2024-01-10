@@ -6,7 +6,8 @@
 prm_add <- function(.prm_tbl, ...){
 
   .prm_tbl <- prm_create(...) |>
-    full_join(.prm_tbl,.) |>
+    (\(.x) full_join(.prm_tbl, .x)
+     )() |>
     as_prm_tbl()
 
   return(.prm_tbl)

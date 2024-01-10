@@ -54,7 +54,8 @@ read_sim_data <- function(run_tbl){
                        cols = any_of(all_cols))
       }) |>
       bind_rows() |>
-      left_join(run_tbl$sim_template[[1]],.) |>
+      (\(.x) left_join(run_tbl$sim_template[[1]], .x)
+       )() |>
       mutate(sim = ifelse(str_detect(variable,'DAT$'),
                           as.numeric(difftime(as.POSIXct(sim,tz='UTC',origin='1970-01-01'),
                                               PDATE,
