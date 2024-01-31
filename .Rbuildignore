@@ -3,3 +3,4 @@
 ^CRAN-RELEASE$
 cran-comments.md
 test_data
+vignettes
