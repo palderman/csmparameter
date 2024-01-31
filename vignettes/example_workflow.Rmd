@@ -1,0 +1,338 @@
+---
+title: "Example workflow with csmparameter"
+author: "Phillip D. Alderman"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example workflow with csmparameter}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+* Parameter estimation is critical for tuning cropping systems models for use with particular cultivars in particular environments. 
+
+* The Decision Support System for Agrotechnology Transfer Cropping System Model (DSSAT-CSM)[@DSSAT2003; @DSSAT2019] is among the most widely used crop modeling systems globally.
+
+* A wide range of parameter estimation tools are available as R packages distributed through the Comprehensive R Archive Network (CRAN; [https://cran.r-project.org/](https://cran.r-project.org/)).
+
+* Although the DSSAT R package [@DSSAT2020] provides functions for reading and writing input and output files for the DSSAT-CSM, further tools are needed to link these functions to R parameter estimation packages.
+
+### Objectives
+
+1. Describe a set of tools from a new R package under development to perform estimation of parameters required for running DSSAT-CSM.
+
+2. Demonstrate a reproducible parameter estimation workflow for estimating cultivar parameters for DSSAT-CSM-CERES-Wheat using these tools.
+
+# Setup
+
+### Load required R packages
+
+```{r loadPackages}
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+library(DSSAT)
+library(csmparameter)
+```
+
+### Set path to DSSAT-CSM executable
+
+Here we assume that the user has DSSAT-CSM installed in their home directory. The following code should be modified to reflect the user's actual path to the DSSAT installation.
+
+```{r}
+options(DSSAT.CSM = file.path(path.expand("~"), "DSSAT48", "dscsm048"))
+```
+
+### Load data and create File T
+
+```{r}
+obs_data <-
+  OKwheatVRT::dtfhs_dth |>
+  filter(variety == "Iba" & location != "El Reno") |>
+  left_join(OKwheatVRT::loc_info) |>
+  group_by(location) |>
+  mutate(across(c(mnet_stid, soil_type, longitude, latitude),
+                \(.x){
+                  if(any(!is.na(.x))){
+                    .x[is.na(.x)] <- unique(.x[!is.na(.x)])
+                  }
+                  .x
+                  })) |>
+  ungroup() |>
+  pivot_longer(cols = c(dtfhs, dth),
+                      names_to = "variable",
+                      values_to = "days_to") |>
+  filter(!is.na(days_to)) |>
+  mutate(plant_date = as.POSIXct(plant_date),
+         DATE = plant_date + days(days_to),
+         GSTD = ifelse(variable == "dtfhs",
+                       31,
+                       55),
+         RSTD = ifelse(variable == "dtfhs",
+                       2.25,
+                       4.0),       
+         TRNO = interaction(location, plant_date) |>
+           factor() |>
+           as.integer())
+
+```
+
+### Exploratory plot for quality control
+
+```{r}
+
+obs_data |>
+  select(TRNO, DATE, RSTD) |>
+  ggplot()+
+  geom_histogram(aes(x = as.Date("2022-01-01") + days(yday(DATE))))+
+  facet_wrap(~RSTD)
+
+```
+
+### Use observed data to create File T
+
+```{r}
+
+obs_data |>
+  select(TRNO, DATE, GSTD, RSTD) |>
+  as_DSSAT_tbl(v_fmt = c(TRNO = "%6.0f", DATE = "%6s", GSTD = "%6.0f", RSTD = "%6.0f")) |>
+  `attr<-`("experiment", "Oklahoma State Wheat Variety Trials") |>
+  write_filet("OKST0001.WHT")
+
+```
+
+### Use observed data to create File X
+
+```{r}
+
+obs_data |>
+  group_by(TRNO) |>
+  summarize(location = unique(location),
+            plant_date = unique(plant_date),
+            hdate = max(DATE)+days(1)) |>
+  with(
+    DSSAT:::filex_template(TNAME = paste0(location, " ", plant_date),
+                           MP = TRNO,
+                           MH = TRNO,
+                           WSTA = "MNETSTIL",
+                           ID_SOIL = "OKSTIL0001",
+                           CR = "WH",
+                           INGENO = "OK0001",
+                           PDATE = plant_date,
+                           PLME = "S",
+                           PLDP = 3,
+                           PPOP = 224,
+                           PLRS = 16,
+                           HDATE = hdate,
+                           START = "P",
+                           SDATE = min(plant_date),
+                           MODEL = "CSCER",
+                           WATER = "N",
+                           NITRO = "N",
+                           PHOTO = "C",
+                           HARVS = "R",
+                           GROUT = "Y",
+                           FMOPT = "C")
+    ) |>
+  `attr<-`("experiment", "Oklahoma State Wheat Variety Trials") |>
+  write_filex("OKST0001.WHX")
+
+```
+
+### Copy soil, cultivar, and weather data into working directory
+
+```{r}
+file.copy("../data/OK.SOL", "./")
+
+file.copy("~/DSSAT48/Weather/MNETSTIL.WTH", "./")
+
+```
+### Create Cultivar file
+
+```{r}
+
+cul <- read_cul(file.path(path.expand("~"), "DSSATEX", "Genotype", "WHCER048.CUL"))
+
+cul |> 
+  filter(`VAR#` == "IB0488") |> 
+  mutate(`VAR#` = "OK0001",
+         `VAR-NAME` = "Iba",
+         `EXP#` = "",
+         P1V = 10) |> 
+  `attr<-`("comments", NULL) |> 
+  write_cul("WHCER048.CUL")
+
+```
+
+### Run example simulation to check settings
+
+```{r}
+
+run_dssat(run_mode = "A",
+          file_name = "OKST0001.WHX")
+
+pgro <- read_output("plantgro.csv")
+pgr2 <- read_output("plantgr2.csv")
+
+filet <- read_filet("OKST0001.WHT")
+
+pgro |> 
+  filter(TRNO %in% 5) |> 
+  ggplot()+
+  geom_line(aes(x = DAP, y = GSTD))
+
+gstd_to_dt <- function(pgro){
+  
+  get_dt <- function(dap, gstd, threshold){
+    .x <- dap[gstd >= threshold]
+    if(length(.x) < 1){
+      NA_real_
+    }else{
+      min(.x)
+    }
+  }
+  
+  pgro |> 
+    group_by(RUN, EXPERIMENT, TRNO) |> 
+    summarize(dtfhs = get_dt(DAP, GSTD, 31),
+              dth = get_dt(DAP, GSTD, 59))
+}
+
+pgro |> 
+  gstd_to_dt()
+
+pgro |>
+  rename(sim = GSTD) |> 
+  full_join(filet) |> 
+  rename(obs = GSTD) |> 
+  select(DATE, obs, sim) |> 
+  ggplot() +
+  geom_point(aes(x = sim, y = obs))+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(c(0, 60))+
+  ylim(c(0, 60))+
+  coord_fixed()
+
+filet
+
+```
+
+# Workflow
+
+### Define parameters
+
+* In the following code, we first define the CERES-Wheat model parameter for vernalization sensitivity (`P1V`) using the `prm_create()` function. The `pkey` argument specifies the cultivar code for the Newton cultivar (`IB0488`). The `pfile` value "WHCER048.CUL" indicates that the `P1V` parameter is found in the CERES-Wheat cultivar file. Minimum and maximum values for the parameter are specified by the `pmin` and `pmax` arguments. The `pfmt` provides the format for the parameter, in this case both parameters are assigned the format for a numerical parameter that occupies 6 spaces with one decimal place precision. The `prm_add()` function is then used to add the definition for the parameter for photoperiod sensitivity (`P1D`). These definitions are stored in a parameter table (`prm_tbl`).
+
+```{r echo=TRUE, message=FALSE}
+prm_tbl <- 
+  prm_create(pname = "P1V", pkey = "OK0001",
+             pfile = "WHCER048.CUL",
+             pmin = 0, pmax = 60,
+             pfmt = "%6.1f") |> 
+  prm_add(pname = "P1D", pkey = "OK0001",
+          pfile = "WHCER048.CUL",
+          pmin = 0, pmax = 200,
+          pfmt = "%6.1f")
+
+```
+
+### Process parameter input files
+
+* Having defined parameters in the `prm_tbl`, a table of processed input files (`input_tbl`) can be created using the `prm_create_input_tbl()` function, as shown in the code below. This function searches for the parameter files listed in the `prm_tbl`, imports each unique file, and constructs a file template into which candidate values of each parameter can be subsequently inserted at each iteration of the parameter estimation process.
+
+```{r echo=TRUE, message=FALSE}
+input_tbl <- 
+  prm_tbl |> 
+  prm_create_input_tbl()
+```
+
+### Define experiment files, treatment numbers and data
+
+```{r echo=TRUE, message=FALSE, cache=TRUE}
+
+expmt_tbl <- 
+  prm_create_expmt_tbl(
+    filex_name = "OKST0001.WHX",
+    data_types = c("RSTD")
+  )
+
+```
+
+* In the code above, we use the function `prm_create_expmt_tbl()` to create a table of experiments, treatments and data types that will be used for parameter estimation. The `filex_name` argument is used to specify a single experiment file or a vector of experiment files. The `trno` argument specifies which treatment numbers to use and the `data_types` argument specifies which variables from the seasonal (File A) or time series (File T) data files to use for estimation.
+
+### Define objective function
+
+* In the following code, we define an objective function for the sum of the relative sum of squared error (`rSSE`), that is the sum of squared error divided by the average of observations for each variable. The simulated values (`sim_tbl`) are first checked for missing values using the `check_sim_data()` function from the `csmparameter` package. If simulated values fail to pass the check, the maximum representable floating point value (`.Machine$double.xmax`) is returned instead.
+
+```{r echo=TRUE, message=FALSE}
+csmparameter::rSSE_fun
+```
+
+
+### Combine elements into a parameter estimation object
+
+* The previous four elements are then combined into a parameter estimation object `prm_est` using the `prm_create_prm_est()` function as shown in the following code.
+
+```{r echo=TRUE, message=FALSE}
+prm_est <- 
+  prm_create_prm_est(expmt_tbl = expmt_tbl,
+                     prm_tbl = prm_tbl,
+                     input_tbl = input_tbl,
+                     obj_fun = SSE_fun)
+```
+
+
+### Run parameter estimation
+
+* Parameter estimation can then be performed with function `run_optim_estimation()`, which uses the general-purpose optimization function `optim()` available in the R `stats` package that comes with the base installation of R. The `method` argument is passed on to the `optim()` function. A value of "L-BFGS-B" specifies the use of a bounded optimization algorithm available through `optim()` [@LBFGSB].
+
+```{r echo=TRUE}
+prm_est_out <- 
+  run_optim_estimation(prm_est = prm_est,
+                       method = "L-BFGS-B")
+
+prm_est_out <-
+  run_optim_estimation(prm_est = prm_est)
+
+prm_est_out <-
+  run_DEoptim_estimation(prm_est = prm_est, control = DEoptim::DEoptim.control(itermax = 5))
+
+?DEoptim::DEoptim.control
+```
+
+```{r}
+
+prm_est_out$par
+prm_est_out$member$pop
+
+write_inputs(prm_est$input_tbl,
+             prm_est$prm_tbl,
+             prm_est_out$par)
+
+run_dssat(run_mode = "A",
+          file_name = "OKST0001.WHX")
+
+pgr2 <- read_output("plantgr2.csv")
+
+pgr2 |>
+  select(-GSTD) |> 
+  rename(sim = RSTD) |> 
+  full_join(filet) |> 
+  rename(obs = RSTD) |> 
+  select(DATE, obs, sim) |> 
+  ggplot() +
+  geom_point(aes(x = sim, y = obs))+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(c(0, 5))+
+  ylim(c(0, 5))+
+  coord_fixed()
+
+```
+
