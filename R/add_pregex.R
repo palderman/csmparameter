@@ -11,7 +11,11 @@ add_pregex <- function(.prm_tbl){
     str_remove('-') |>
     as.numeric()
 
-  .prm_tbl$pregex <- generate_pregex(widths)
+  if(length(widths > 0)){
+    .prm_tbl$pregex <- generate_pregex(widths)
+  }else{
+    .prm_tbl$pregex <- NA_character_
+  }
 
   return(.prm_tbl)
 

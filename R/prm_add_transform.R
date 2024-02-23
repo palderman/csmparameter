@@ -133,12 +133,19 @@ prm_add_transform <- function(prm_df, ptrans, pfile = "", ...){
     prm_df$ptransform <- vector(mode = "list", length = nrow(prm_df))
   }
 
+  # Construct data frame of transformed parameters for
+  #  subsequent merging with prm_df
+  ptrans_df <-
+    data.frame(pname = ptrans_get_pname(as.list(ptrans)),
+               ...,
+               stringsAsFactors = FALSE) |>
+    add_pregex() |>
+    as_prm_tbl()
+
   # Add any transformed parameters to prm_df that are not
   #  already present
   prm_df <- merge(prm_df,
-                  data.frame(pname = ptrans_get_pname(as.list(ptrans)),
-                             ...,
-                             stringsAsFactors = FALSE),
+                  ptrans_df,
                   all = TRUE)
 
   # Sort by pnum

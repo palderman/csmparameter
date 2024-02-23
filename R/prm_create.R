@@ -4,23 +4,22 @@
 #'
 #' @export
 #'
-prm_create <- function(pname, pfile,
+prm_create <- function(pname,
+                       pfile = NA,
                        pmin = -Inf,
                        pmax = Inf,
-                       pmu = NA,
-                       psigma = NA,
+                       pmu = NA_real_,
+                       psigma = NA_real_,
                        pdist = "uniform",
-                       ptier = as.character(NA),
-                       pkey = as.character(NA),
-                       plev = as.integer(NA),
-                       pind = as.integer(NA),
-                       pfmt = as.character(NA),
+                       ptier = NA_character_,
+                       pkey = NA_character_,
+                       plev = NA_integer_,
+                       pind = NA_integer_,
+                       pfmt = NA_character_,
                        pnum = NULL,
                        pwt = NULL){
 
   if(any(is.null(pname) | is.na(pname))) warning("pname cannot be NULL or missing")
-  if(any(is.null(pfile) | is.na(pfile))) warning("pfile cannot be NULL or missing")
-
   if(all(is.null(pmin))) pmin = -Inf
   if(all(is.null(pmax))) pmax = Inf
   if(all(is.null(pmu))) pmu = NA
