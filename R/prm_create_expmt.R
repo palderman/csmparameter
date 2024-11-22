@@ -6,7 +6,7 @@
 #' @importFrom tibble tibble
 #' @importFrom tidyr pivot_longer
 #'
-create_expmt <- function(filex_name, trno=NULL, data_types=NULL,
+prm_create_expmt <- function(filex_name, trno=NULL, data_types=NULL,
                                rewrite_filex = FALSE){
 
   if(is.null(trno)){

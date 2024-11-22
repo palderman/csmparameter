@@ -1,7 +1,7 @@
 #'
 #' @export
 #'
-prm_create_input_tbl <- function(prm_tbl, search_path = ".", ...){
+prm_create_inp_tbl <- function(prm_tbl, search_path = ".", ...){
 
   file_list <- prm_tbl$pfile |>
     unique()

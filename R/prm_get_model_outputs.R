@@ -3,7 +3,7 @@
 #' @importFrom dplyr  is_grouped_df group_by select group_map
 #' @importFrom tidyr crossing unnest
 #'
-get_model_outputs <- function(run_tbl){
+prm_get_model_outputs <- function(run_tbl){
 
   outputs <- run_tbl |>
     group_map(~{crossing(.y,.x) |>

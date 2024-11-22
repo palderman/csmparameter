@@ -1,6 +1,6 @@
 #' @export
 #'
-run_optim_estimation <- function(prm_est, method='L-BFGS-B', control=list()){
+prm_run_optim <- function(prm_est, method='L-BFGS-B', control=list()){
 
   if("pmin" %in% colnames(prm_est$prm_tbl)){
     lower <- prm_est$prm_tbl$pmin
@@ -22,7 +22,7 @@ run_optim_estimation <- function(prm_est, method='L-BFGS-B', control=list()){
   names(par_init) <- prm_est$prm_tbl$pname
 
   est_out <- optim(par=par_init,
-                   fn = est_obj_fun,
+                   fn = prm_eval_obj_fun,
                    prm_est = prm_est,
                    method = method,
                    lower = lower,

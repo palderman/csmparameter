@@ -4,8 +4,6 @@
 #' @importFrom lubridate is.POSIXct
 #' @importFrom dplyr  left_join mutate_if select
 #'
-#' @export
-#'
 dat_to_dap <- function(pdate,.data){
 
   dat_cols <- map_lgl(.data,~is.POSIXct(.)) & !str_detect(colnames(.data),'^DATE$')

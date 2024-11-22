@@ -1,9 +1,10 @@
+#' Add parameter format
 #'
 #' @importFrom dplyr group_by  group_map rowwise mutate
 #'
 #' @export
 #'
-add_pfmt <- function(.prm_tbl, input_tbl){
+prm_add_pfmt <- function(.prm_tbl, input_tbl){
 
   v_fmt <- group_by(input_tbl,file_name) |>
     group_map(~attr(.$file_processed[[1]],'v_fmt'))

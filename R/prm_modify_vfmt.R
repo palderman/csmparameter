@@ -3,7 +3,7 @@
 #'
 #' @export
 #'
-modify_vfmt <- function(.input, pname, pfmt){
+prm_modify_vfmt <- function(.input, pname, pfmt){
 
   v_fmt <- attr(.input,'v_fmt')
 

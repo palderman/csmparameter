@@ -1,10 +1,11 @@
+#' Add regular expressions for parameters
 #'
 #' @importFrom dplyr  ungroup mutate
 #' @importFrom stringr str_extract str_remove
 #'
 #' @export
 #'
-add_pregex <- function(.prm_tbl){
+prm_add_pregex <- function(.prm_tbl){
 
   widths <- .prm_tbl$pfmt |>
     str_extract('(?<=%)-*[0-9]+') |>

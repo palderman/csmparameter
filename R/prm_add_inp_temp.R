@@ -1,10 +1,12 @@
+#' Add input template
+#'
 #' @export
 #'
 #' @importFrom dplyr  filter group_by group_modify mutate ungroup select
 #' @importFrom stringr str_replace_all str_detect
 #' @importFrom DSSAT mutate_cond
 #'
-add_input_template <- function(.input_tbl,.prm_tbl){
+prm_add_inp_temp <- function(.input_tbl, .prm_tbl){
 
   .input_tbl <- .input_tbl |>
     group_by(file_name) |>

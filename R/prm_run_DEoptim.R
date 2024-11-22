@@ -7,7 +7,7 @@
 #' @param control a named list created using \link[DEoptim]{DEoptim.control}() from the
 #'  DEoptim package (See \link[DEoptim]{DEoptim.control} for details)
 #'
-run_DEoptim_estimation <- function(prm_est, control=DEoptim::DEoptim.control()){
+prm_run_DEoptim <- function(prm_est, control=DEoptim::DEoptim.control()){
 
   if(!requireNamespace("DEoptim")){
     stop("run_DEoptim_estimation() requires the DEoptim package. Please install it and try again.")
@@ -36,7 +36,7 @@ run_DEoptim_estimation <- function(prm_est, control=DEoptim::DEoptim.control()){
     control$initialpop <- prm_sample_prior(prm_est$prm_tbl, n = NP)
   }
 
-  est_out <- DEoptim::DEoptim(fn = est_obj_fun,
+  est_out <- DEoptim::DEoptim(fn = prm_eval_obj_fun,
                               lower = lower,
                               upper = upper,
                               control = control,

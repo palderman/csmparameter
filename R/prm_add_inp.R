@@ -3,9 +3,9 @@
 #'
 #' @export
 #'
-add_prm_input <- function(.input_tbl, ...){
+prm_add_inp <- function(.input_tbl, ...){
 
-  .input_tbl <- create_prm_input(...) |>
+  .input_tbl <- prm_create_inp_tbl(...) |>
     (\(.x) bind_rows(.input_tbl, .x))() |>
     as_prm_tbl()
 

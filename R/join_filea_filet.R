@@ -1,8 +1,6 @@
 #'
 #' @importFrom dplyr  mutate full_join
 #'
-#' @export
-#'
 join_filea_filet <- function(filea=NULL,filet=NULL){
   if(!is.null(filea)){
     filea <- filea |>

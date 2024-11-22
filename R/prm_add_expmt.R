@@ -3,7 +3,7 @@
 #'
 #' @export
 #'
-add_expmt <- function(.expmt_tbl, ...){
+prm_add_expmt <- function(.expmt_tbl, ...){
 
   .expmt_tbl <- create_expmt(...) |>
     (\(.x) full_join(.expmt_table, .x, by='filex'))() |>

@@ -1,8 +1,8 @@
 #' @export
 #'
-SSE_fun <- function(obs_tbl, sim_tbl, ...){
+prm_SSE <- function(obs_tbl, sim_tbl, ...){
 
-  if(check_sim_data(sim_tbl)){
+  if(prm_check_sim(sim_tbl)){
     SSE <- obs_tbl |>
       full_join(sim_tbl) |>
       mutate(sq_err=(obs-sim)^2) |>

@@ -1,7 +1,9 @@
+#' Add output table
+#'
 #' @importFrom dplyr  group_by mutate group_modify
 #' @importFrom DSSAT run_dssat
 #'
-add_output_tbl <- function(.expmt){
+prm_add_out_tbl <- function(.expmt){
 
   write_dssbatch(x=.expmt$filex_name,trtno=.expmt$trno[[1]])
 

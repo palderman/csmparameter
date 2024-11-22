@@ -1,6 +1,6 @@
 #' @export
 #'
-check_sim_data <- function(obs_sim){
+prm_check_sim <- function(obs_sim){
 
   if(any(is.na(obs_sim$sim))){
     warn_out <- obs_sim |>

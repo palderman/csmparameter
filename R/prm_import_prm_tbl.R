@@ -4,7 +4,7 @@
 #'
 #' @export
 #'
-import_prm_tbl_csv <- function(file_name){
+prm_import_prm_tbl <- function(file_name){
 
   prm_tbl_csv <- read_csv(file_name)
 

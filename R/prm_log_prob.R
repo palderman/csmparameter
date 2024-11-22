@@ -18,7 +18,7 @@ lp_prior_density <- function(prm_tbl, pval){
 #' @importFrom tibble add_column
 #' @importFrom dplyr full_join mutate
 #'
-lp_fun <- function(obs_tbl, sim_tbl, prm_tbl, pval){
+prm_log_prob <- function(obs_tbl, sim_tbl, prm_tbl, pval){
 
   if(check_sim_data(sim_tbl)){
 

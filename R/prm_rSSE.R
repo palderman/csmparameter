@@ -1,8 +1,8 @@
 #' @export
 #'
-rSSE_fun <- function(obs_tbl, sim_tbl, ...){
+prm_rSSE <- function(obs_tbl, sim_tbl, ...){
 
-  if(check_sim_data(sim_tbl)){
+  if(prm_check_sim(sim_tbl)){
     rSSE <- obs_tbl |>
       full_join(sim_tbl)  |>
       group_by(variable)  |>

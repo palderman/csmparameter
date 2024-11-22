@@ -3,7 +3,7 @@
 #' @importFrom dplyr  group_by group_walk
 #' @importFrom stringr str_replace_all
 #'
-write_inputs <- function(.input_tbl, .prm_tbl, pvals){
+prm_write_inputs <- function(.input_tbl, .prm_tbl, pvals){
 
   pval_with_tprm <- prm_apply_transform(.prm_tbl, pvals)
 

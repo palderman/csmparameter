@@ -7,7 +7,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom tidyr pivot_longer unnest
 #'
-read_sim_data <- function(run_tbl){
+prm_read_sim <- function(run_tbl){
 
   if(nrow(run_tbl$sim_template[[1]]) > 0){
 

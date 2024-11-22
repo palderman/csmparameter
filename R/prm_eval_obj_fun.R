@@ -1,8 +1,10 @@
+#' Evaluate the objective function
+#'
 #' @export
 #'
-est_obj_fun <- function(pvals, prm_est){
+prm_eval_obj_fun <- function(pvals, prm_est){
 
-  write_inputs(prm_est$input_tbl, prm_est$prm_tbl, pvals)
+  prm_write_inputs(prm_est$input_tbl, prm_est$prm_tbl, pvals)
 
   sim_tbl <- suppressMessages(get_model_outputs(prm_est$run_tbl)) |>
     bind_rows()
