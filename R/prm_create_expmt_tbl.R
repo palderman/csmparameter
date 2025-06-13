@@ -18,23 +18,19 @@ prm_create_expmt_tbl <- function(expmt, trno = NULL, variables = NULL){
   if(is.null(trno)) trno <- lapply(1:length(expmt), ~{NULL})
   if(is.null(variables)) variables <- lapply(1:length(expmt), ~{NULL})
 
-  expmt_trno_tbl <- tibble(filex_name = filex_name,
+  expmt_trno_tbl <- tibble(expmt_index = 1:length(expmt),
+                           expmt = expmt,
                            trno = trno,
                            data_types = data_types)
 
   expmt_tbl <-
-
-  for(i in 1:length(expmt)){
-
-  }
-
-  expmt_tbl <- filex_trno_tbl |>
-    group_by(filex_name) |>
-    group_map(~prm_create_expmt(expmt = .y$expmt,
+    filex_trno_tbl |>
+    group_by(expmt_index) |>
+    group_map(~prm_create_expmt(expmt = .x$expmt[[1]],
                                   trno = .x$trno[[1]],
                                   data_types = .x$data_types[[1]],
                                   rewrite_filex = rewrite_filex)) |>
       bind_rows()
-  }
+
   return(expmt_tbl)
 }
