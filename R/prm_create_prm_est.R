@@ -1,3 +1,5 @@
+#' Create a parameter estimation object
+#'
 #' @export
 #'
 #' @importFrom dplyr summarize bind_rows full_join pull
@@ -5,8 +7,16 @@
 #' @importFrom purrr map
 #' @importFrom tidyr unnest
 #'
-prm_create_prm_est <- function(expmt_tbl, input_tbl,
-                               prm_tbl, obj_fun, dssat_call){
+#' @param expmt_tbl a data frame of experiment definitions as created by
+#'   \link[csmparameter]{prm_create_expmt_tbl}
+#' @param inp_tbl a data frame of input definitions as created by
+#'   \link{prm_create_inp_tbl}
+#' @param prm_tbl a data frame
+#'
+prm_create_prm_est <- function(expmt_tbl, inp_tbl,
+                               prm_tbl, obj_fun,
+                               model_type = "DSSAT-CSM",
+                               dssat_call){
 
   if(missing(dssat_call)){
     dssat_exec <- getOption("DSSAT.CSM")

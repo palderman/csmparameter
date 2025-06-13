@@ -6,11 +6,18 @@
 #' @importFrom tibble tibble
 #' @importFrom tidyr pivot_longer
 #'
-prm_create_expmt <- function(filex_name, trno=NULL, data_types=NULL,
-                               rewrite_filex = FALSE){
+#' @param expmt either the file name of a DSSAT-formatted experiment
+#'   file (File X) or a list as would be returned by
+#'   \link[DSSAT]{read_filex} or \link[DSSAT]{filex_template}.
+#'
+#' @param data a data frame of seasonal and within-season data to use for
+#'   parameter estimation or a character vector of names for DSSAT-formatted
+#'   files for seasonal (File A) or within-season (File T) data
+#'
+prm_create_expmt <- function(expmt, data){
 
   if(is.null(trno)){
-    filex <- read_filex(filex_name)
+    filex <- read_filex(expmt)
     trno <- filex$TREATMENTS$N
   }
 
@@ -53,14 +60,14 @@ prm_create_expmt <- function(filex_name, trno=NULL, data_types=NULL,
       unique()
   }
 
-  if(rewrite_filex){
-    if(!exists('filex', envir = environment(fun = NULL))){
-      filex <- read_filex(filex_name)
-    }
-    write_filex(filex,basename(filex_name))
-  }else{
-    file.copy(filex_name,basename(filex_name))
-  }
+  # if(rewrite_filex){
+  #   if(!exists('filex', envir = environment(fun = NULL))){
+  #     filex <- read_filex(filex_name)
+  #   }
+  #   write_filex(filex,basename(filex_name))
+  # }else{
+  #   file.copy(filex_name,basename(filex_name))
+  # }
 
   filex_name <- basename(filex_name)
 
