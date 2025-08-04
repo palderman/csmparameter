@@ -3,8 +3,8 @@
 #' @importFrom dplyr filter mutate rowwise pull
 #' @importFrom purrr map_dbl map_lgl
 #'
-lp_prior_density <- function(prm_tbl, pval){
-  prm_tbl |>
+lp_prior_density <- function(prm_df, pval){
+  prm_df |>
     add_column(pval = pval) |>
     filter(map_lgl(pdensity, ~{!is.null(.x)})) |>
     rowwise() |>
@@ -18,16 +18,16 @@ lp_prior_density <- function(prm_tbl, pval){
 #' @importFrom tibble add_column
 #' @importFrom dplyr full_join mutate
 #'
-prm_log_prob <- function(obs_tbl, sim_tbl, prm_tbl, pval){
+prm_log_prob <- function(obs_df, sim_df, prm_df, pval){
 
-  if(check_sim_data(sim_tbl)){
+  if(check_sim_data(sim_df)){
 
     # Calculate prior density
-    prior_lp <- lp_prior_density(prm_tbl, pval)
+    prior_lp <- lp_prior_density(prm_df, pval)
 
-    log_likelihood <- obs_tbl |>
+    log_likelihood <- obs_df |>
       # Combine observed and simulated data
-      full_join(sim_tbl) |>
+      full_join(sim_df) |>
       # Extract variance term from from pval vector
       mutate(obs_sigma = pval[lp_sigma_ind]) |>
       # Calculate log-likelihood assuming errors normally distributed

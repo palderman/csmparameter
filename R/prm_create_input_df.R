@@ -1,9 +1,9 @@
 #'
 #' @export
 #'
-prm_create_inp_tbl <- function(prm_tbl, search_path = ".", ...){
+prm_create_inp_df <- function(prm_df, search_path = ".", ...){
 
-  file_list <- prm_tbl$pfile |>
+  file_list <- prm_df$pfile |>
     unique()
 
   file_list <- file_list[file_list != ""]
@@ -48,14 +48,14 @@ prm_create_inp_tbl <- function(prm_tbl, search_path = ".", ...){
 
   }
 
-  input_tbl <- data.frame(file_name = file_name)
+  input_df <- data.frame(file_name = file_name)
 
-  input_tbl$file_processed <- file_processed
+  input_df$file_processed <- file_processed
 
-  input_tbl <- input_tbl |>
-    add_input_template(prm_tbl) |>
-    as_prm_input_tbl()
+  input_df <- input_df |>
+    add_input_template(prm_df) |>
+    as_prm_input_df()
 
-  return(input_tbl)
+  return(input_df)
 
 }

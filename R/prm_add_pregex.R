@@ -5,19 +5,19 @@
 #'
 #' @export
 #'
-prm_add_pregex <- function(.prm_tbl){
+prm_add_pregex <- function(.prm_df){
 
-  widths <- .prm_tbl$pfmt |>
+  widths <- .prm_df$pfmt |>
     str_extract('(?<=%)-*[0-9]+') |>
     str_remove('-') |>
     as.numeric()
 
   if(length(widths > 0)){
-    .prm_tbl$pregex <- generate_pregex(widths)
+    .prm_df$pregex <- generate_pregex(widths)
   }else{
-    .prm_tbl$pregex <- NA_character_
+    .prm_df$pregex <- NA_character_
   }
 
-  return(.prm_tbl)
+  return(.prm_df)
 
 }

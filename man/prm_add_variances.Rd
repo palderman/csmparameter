@@ -2,11 +2,11 @@
 % Please edit documentation in R/prm_add_variances.R
 \name{prm_add_variances}
 \alias{prm_add_variances}
-\title{Add hyperparameters for variance terms ("model error") to prm_tbl}
+\title{Add hyperparameters for variance terms ("model error") to prm_df}
 \usage{
 prm_add_variances(
-  prm_tbl,
-  obs_tbl,
+  prm_df,
+  obs_df,
   pmin = 0,
   pmax = Inf,
   pmu = 0,
@@ -16,10 +16,10 @@ prm_add_variances(
 )
 }
 \arguments{
-\item{obs_tbl}{a tibble as produced by the create_expmt()
+\item{obs_df}{a tibble as produced by the create_expmt()
 function grouped by the factors which identify the observation
 groups for which a variance term should be estimated}
 }
 \description{
-Add hyperparameters for variance terms ("model error") to prm_tbl
+Add hyperparameters for variance terms ("model error") to prm_df
 }

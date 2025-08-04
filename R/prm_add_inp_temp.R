@@ -6,12 +6,12 @@
 #' @importFrom stringr str_replace_all str_detect
 #' @importFrom DSSAT mutate_cond
 #'
-prm_add_inp_temp <- function(.input_tbl, .prm_tbl){
+prm_add_inp_temp <- function(.input_df, .prm_df){
 
-  .input_tbl <- .input_tbl |>
+  .input_df <- .input_df |>
     group_by(file_name) |>
     group_modify(~{
-      pt <- filter(.prm_tbl, pfile == .y$file_name) |>
+      pt <- filter(.prm_df, pfile == .y$file_name) |>
         mutate(pfmt = str_replace_all(pfmt,'(\\..*)|([a-z])','s'))
       if(nrow(pt) > 0){
         fp <- .x$file_processed[[1]]
@@ -32,5 +32,5 @@ prm_add_inp_temp <- function(.input_tbl, .prm_tbl){
     ungroup() |>
     select(-file_processed)
 
-  return(.input_tbl)
+  return(.input_df)
 }

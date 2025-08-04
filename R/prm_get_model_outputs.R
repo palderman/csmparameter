@@ -9,13 +9,13 @@
 #'
 prm_get_model_outputs <- function(prm_est, pvals){
 
-  run_tbl <- prmest$run_tbl
+  run_df <- prmest$run_df
 
   if(prm_est$model_type == "DSSAT-CSM"){
 
-    prm_write_inputs(prm_est$input_tbl, prm_est$prm_tbl, pvals)
+    prm_write_inputs(prm_est$input_df, prm_est$prm_df, pvals)
 
-    outputs <- run_tbl |>
+    outputs <- run_df |>
       group_map(~{crossing(.y,.x) |>
           select(filex_trno) |>
           unnest(filex_trno) |>

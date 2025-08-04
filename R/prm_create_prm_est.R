@@ -7,14 +7,14 @@
 #' @importFrom purrr map
 #' @importFrom tidyr unnest
 #'
-#' @param expmt_tbl a data frame of experiment definitions as created by
-#'   \link[csmparameter]{prm_create_expmt_tbl}
-#' @param inp_tbl a data frame of input definitions as created by
-#'   \link{prm_create_inp_tbl}
-#' @param prm_tbl a data frame
+#' @param expmt_df a data frame of experiment definitions as created by
+#'   \link[csmparameter]{prm_create_expmt_df}
+#' @param inp_df a data frame of input definitions as created by
+#'   \link{prm_create_inp_df}
+#' @param prm_df a data frame
 #'
-prm_create_prm_est <- function(expmt_tbl, inp_tbl,
-                               prm_tbl, obj_fun,
+prm_create_prm_est <- function(expmt_df, inp_df,
+                               prm_df, obj_fun,
                                model_type = "DSSAT-CSM",
                                dssat_call){
 
@@ -27,7 +27,7 @@ prm_create_prm_est <- function(expmt_tbl, inp_tbl,
       paste("B", file_name, sep = " ")
   }
 
-  run_tbl <- expmt_tbl |>
+  run_df <- expmt_df |>
     summarize(filex_trno = tibble(filex_name = filex_name,trno = trno) |>
                 unnest(cols=trno) |>
                 list(),
@@ -35,22 +35,22 @@ prm_create_prm_est <- function(expmt_tbl, inp_tbl,
                 map(~full_join(.$data_template[[1]],.$pdate[[1]])) |>
                 reduce(full_join) |>
                 list(),
-              out_tbl = out_tbl |>
+              out_df = out_df |>
                 map(~unnest(.,cols=col_names)) |>
                 reduce(full_join) |>
                 list(),
               dssat_call = dssat_call,
               .groups = "keep")
 
-  obs_tbl <- expmt_tbl |>
-    pull(obs_tbl) |>
+  obs_df <- expmt_df |>
+    pull(obs_df) |>
     bind_rows()
 
-  prm_est <- list(expmt_tbl = expmt_tbl,
-                 input_tbl = input_tbl,
-                 prm_tbl = prm_tbl,
-                 run_tbl = run_tbl,
-                 obs_tbl = obs_tbl,
+  prm_est <- list(expmt_df = expmt_df,
+                 input_df = input_df,
+                 prm_df = prm_df,
+                 run_df = run_df,
+                 obs_df = obs_df,
                  obj_fun = obj_fun)
 
 }

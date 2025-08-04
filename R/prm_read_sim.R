@@ -7,11 +7,11 @@
 #' @importFrom stringr str_detect
 #' @importFrom tidyr pivot_longer unnest
 #'
-prm_read_sim <- function(run_tbl){
+prm_read_sim <- function(run_df){
 
-  if(nrow(run_tbl$sim_template[[1]]) > 0){
+  if(nrow(run_df$sim_template[[1]]) > 0){
 
-    run_expmt <- run_tbl |>
+    run_expmt <- run_df |>
       select(sim_template) |>
       unnest(sim_template) |>
       group_by(EXPERIMENT,TRNO) |>
@@ -20,21 +20,21 @@ prm_read_sim <- function(run_tbl){
       mutate(RUN = 1:n(),
              RUNNO = RUN)
 
-    all_cols <- run_tbl |>
+    all_cols <- run_df |>
       ungroup() |>
-      select(out_tbl) |>
-      unnest(out_tbl) |>
+      select(out_df) |>
+      unnest(out_df) |>
       pull(col_names)
 
-    out_tbl <- run_tbl |>
+    out_df <- run_df |>
       ungroup() |>
-      select(out_tbl) |>
-      unnest(out_tbl)
+      select(out_df) |>
+      unnest(out_df)
 
     # Reject if any output file is missing
     # This assumes that if any output file is missing the simulation failed
-    if(all(file.exists(out_tbl$file_name))){
-      out <- out_tbl |>
+    if(all(file.exists(out_df$file_name))){
+      out <- out_df |>
         group_by(file_name) |>
         group_map(~{
           # read_output(.y$file_name,read_only = c('TRNO','DATE','RUN','RUNNO',.x$col_names)) |>
@@ -45,8 +45,8 @@ prm_read_sim <- function(run_tbl){
             }
             .x
             })() |>
-            filter(TRNO %in% run_tbl$sim_template[[1]]$TRNO &
-                   DATE %in% run_tbl$sim_template[[1]]$DATE) |>
+            filter(TRNO %in% run_df$sim_template[[1]]$TRNO &
+                   DATE %in% run_df$sim_template[[1]]$DATE) |>
             rename_with(~str_replace(.,'RUNNO','RUN')) |>
             select(-matches("(EXPERIMENT)|(MODEL)")) |>
             full_join(run_expmt) |>
@@ -56,7 +56,7 @@ prm_read_sim <- function(run_tbl){
                          cols = any_of(all_cols))
         }) |>
         bind_rows() |>
-        (\(.x) left_join(run_tbl$sim_template[[1]], .x)
+        (\(.x) left_join(run_df$sim_template[[1]], .x)
          )() |>
         mutate(sim = ifelse(str_detect(variable,'DAT$'),
                             as.numeric(difftime(as.POSIXct(sim,tz='UTC',origin='1970-01-01'),
@@ -65,12 +65,12 @@ prm_read_sim <- function(run_tbl){
                             sim)) |>
         select(-PDATE)
       }else{
-        out <- run_tbl$sim_template[[1]] |>
+        out <- run_df$sim_template[[1]] |>
           mutate(sim = NA_real_) |>
           select(-PDATE)
       }
   }else{
-    out <- run_tbl$sim_template[[1]] |>
+    out <- run_df$sim_template[[1]] |>
       mutate(sim = vector("numeric")) |>
       select(-PDATE)
   }

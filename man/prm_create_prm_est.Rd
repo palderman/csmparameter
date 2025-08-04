@@ -5,19 +5,22 @@
 \title{Create a parameter estimation object}
 \usage{
 prm_create_prm_est(
-  expmt_tbl,
-  input_tbl,
-  prm_tbl,
+  expmt_df,
+  inp_df,
+  prm_df,
   obj_fun,
   model_type = "DSSAT-CSM",
   dssat_call
 )
 }
 \arguments{
-\item{expmt_tbl}{a data frame of experiment definitions as created by
-\link[csmparameter]{prm_create_expmt_tbl}}
+\item{expmt_df}{a data frame of experiment definitions as created by
+\link[csmparameter]{prm_create_expmt_df}}
 
-\item{input_tbl}{a data frame of inputs}
+\item{inp_df}{a data frame of input definitions as created by
+\link{prm_create_inp_df}}
+
+\item{prm_df}{a data frame}
 }
 \description{
 Create a parameter estimation object

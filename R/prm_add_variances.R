@@ -1,4 +1,4 @@
-#' Add hyperparameters for variance terms ("model error") to prm_tbl
+#' Add hyperparameters for variance terms ("model error") to prm_df
 #'
 #' @export
 #'
@@ -9,12 +9,12 @@
 #' @importFrom tibble tibble
 #' @importFrom lubridate is.POSIXt
 #'
-#' @param obs_tbl a tibble as produced by the create_expmt()
+#' @param obs_df a tibble as produced by the create_expmt()
 #'  function grouped by the factors which identify the observation
 #'  groups for which a variance term should be estimated
 #'
-prm_add_variances <- function(prm_tbl,
-                              obs_tbl,
+prm_add_variances <- function(prm_df,
+                              obs_df,
                               pmin = 0,
                               pmax = Inf,
                               pmu = 0,
@@ -22,21 +22,21 @@ prm_add_variances <- function(prm_tbl,
                               pdist = "normal",
                               ...){
 
-  prior_tbl <- tibble(pmin = pmin,
+  prior_df <- tibble(pmin = pmin,
                     pmax = pmax,
                     pmu = pmu,
                     psigma = psigma,
                     pdist = pdist,
                     ...) |>
-    # Join prior data with obs_tbl and suppress message
-    (\(.x) suppressMessages(full_join(.x, obs_tbl))
+    # Join prior data with obs_df and suppress message
+    (\(.x) suppressMessages(full_join(.x, obs_df))
      )() |>
-    # Impose grouping structure from obs_tbl on var_tbl
-    (\(.x) do.call(group_by, c(list(.x), groups(obs_tbl)))
+    # Impose grouping structure from obs_df on var_df
+    (\(.x) do.call(group_by, c(list(.x), groups(obs_df)))
      )() |>
     summarize(across(c(pmin, pmax, pmu, psigma, pdist), unique))
 
-  var_tbl <- obs_tbl |>
+  var_df <- obs_df |>
     # Drop non-grouping variables
     summarize() |>
     ungroup() |>
@@ -55,9 +55,9 @@ prm_add_variances <- function(prm_tbl,
     # Prepend pname with variance label
     mutate(pname = str_c("variance;", pname)) |>
     # Combine with tibble with prior information
-    bind_cols(prior_tbl)
+    bind_cols(prior_df)
 
-  output <- var_tbl |>
+  output <- var_df |>
     # Create parameter table for variance parameters
     with(prm_create(pname = pname,
                     pfile = "",
@@ -66,9 +66,9 @@ prm_add_variances <- function(prm_tbl,
                     pmu = pmu,
                     psigma = psigma,
                     pdist = pdist,
-                    pnum = max(prm_tbl$pnum)+(1:length(pname)))) |>
-    # Combine variance parameter table with original prm_tbl
-    (\(.x) bind_rows(prm_tbl, .x)
+                    pnum = max(prm_df$pnum)+(1:length(pname)))) |>
+    # Combine variance parameter table with original prm_df
+    (\(.x) bind_rows(prm_df, .x)
      )()
 
   return(output)

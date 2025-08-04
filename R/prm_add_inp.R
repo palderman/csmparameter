@@ -3,11 +3,11 @@
 #'
 #' @export
 #'
-prm_add_inp <- function(.input_tbl, ...){
+prm_add_inp <- function(.input_df, ...){
 
-  .input_tbl <- prm_create_inp_tbl(...) |>
-    (\(.x) bind_rows(.input_tbl, .x))() |>
-    as_prm_tbl()
+  .input_df <- prm_create_inp_df(...) |>
+    (\(.x) bind_rows(.input_df, .x))() |>
+    as_prm_df()
 
-  return(.input_tbl)
+  return(.input_df)
 }

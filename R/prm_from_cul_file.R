@@ -7,7 +7,7 @@ prm_from_cul_file <- function(file_path){
 
   cul <- read_cul(file_path)
 
-  prm_tbl <- cul |>
+  prm_df <- cul |>
     filter(`VAR-NAME` %in% c("MINIMA", "MAXIMA", "DEFAULT")) |>
     select(-`VAR#`, -`EXP#`, -`ECO#`) |>
     pivot_longer(-`VAR-NAME`) |>
@@ -26,5 +26,5 @@ prm_from_cul_file <- function(file_path){
                     psigma = psigma,
                     pdist = "normal"))
 
-    return(prm_tbl)
+    return(prm_df)
 }

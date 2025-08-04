@@ -4,7 +4,7 @@
 \alias{prm_add_pfmt}
 \title{Add parameter format}
 \usage{
-prm_add_pfmt(.prm_tbl, input_tbl)
+prm_add_pfmt(.prm_df, input_df)
 }
 \description{
 Add parameter format

@@ -27,7 +27,7 @@ find_output_variables <- function(.expmt){
   }
   names(headers) <- names(raw_out_files)
 
-  out_tbl <- headers |>
+  out_df <- headers |>
     map_lgl(~any(str_detect(., data_type_regex))) |>
     (\(.x) subset(raw_out_files, .x)
      )() |>
@@ -49,17 +49,17 @@ find_output_variables <- function(.expmt){
     ungroup() |>
     arrange(nvars)
 
-  for(i in 1:nrow(out_tbl)){
-    if(i < nrow(out_tbl)){
-      out_tbl$col_names[i] <- setdiff(out_tbl$dtype_check[[i]],
-                                      unlist(out_tbl$dtype_check[-1:-i])) |>
+  for(i in 1:nrow(out_df)){
+    if(i < nrow(out_df)){
+      out_df$col_names[i] <- setdiff(out_df$dtype_check[[i]],
+                                      unlist(out_df$dtype_check[-1:-i])) |>
         list()
     }else{
-      out_tbl$col_names[i] <- out_tbl$dtype_check[i]
+      out_df$col_names[i] <- out_df$dtype_check[i]
     }
   }
 
-  missing_data_types <- setdiff(unlist(.expmt$data_types),unlist(out_tbl$col_names))
+  missing_data_types <- setdiff(unlist(.expmt$data_types),unlist(out_df$col_names))
 
   if(length(missing_data_types) > 0){
     err_msg <- str_c(missing_data_types,collapse = ', ') |>
@@ -69,9 +69,9 @@ find_output_variables <- function(.expmt){
     warning(err_msg)
   }
 
-  out_tbl <- filter(out_tbl,map_lgl(col_names,~{length(.) > 0})) |>
+  out_df <- filter(out_df,map_lgl(col_names,~{length(.) > 0})) |>
     select(file_name,col_names)
 
-  return(out_tbl)
+  return(out_df)
 
 }

@@ -4,7 +4,7 @@
 \alias{prm_calc_pval}
 \title{Calculate parameter values (regular and transformed)}
 \usage{
-prm_calc_pval(prm_tbl, pval_in = NULL, n = 1)
+prm_calc_pval(prm_df, pval_in = NULL, n = 1)
 }
 \description{
 Calculate parameter values (regular and transformed)

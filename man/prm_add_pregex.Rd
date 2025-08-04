@@ -4,7 +4,7 @@
 \alias{prm_add_pregex}
 \title{Add regular expressions for parameters}
 \usage{
-prm_add_pregex(.prm_tbl)
+prm_add_pregex(.prm_df)
 }
 \description{
 Add regular expressions for parameters

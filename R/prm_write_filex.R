@@ -1,9 +1,9 @@
 #' @importFrom dplyr  group_by group_walk
 #' @importFrom DSSAT write_filex
 #'
-prm_write_filex <- function(.expmt_tbl){
+prm_write_filex <- function(.expmt_df){
 
-  .expmt_tbl |>
+  .expmt_df |>
     group_by(filex_name) |>
     group_walk(~{
       if('VBOSE' %in% colnames(.x$filex[[1]]$`SIMULATION CONTROLS`)){

@@ -4,7 +4,7 @@
 \alias{prm_add_inp_temp}
 \title{Add input template}
 \usage{
-prm_add_inp_temp(.input_tbl, .prm_tbl)
+prm_add_inp_temp(.input_df, .prm_df)
 }
 \description{
 Add input template

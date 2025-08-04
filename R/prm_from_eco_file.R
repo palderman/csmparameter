@@ -7,7 +7,7 @@ prm_from_eco_file <- function(file_path){
 
   eco <- read_eco(file_path)
 
-  prm_tbl <- eco |>
+  prm_df <- eco |>
     filter(`ECO#` %in% c("999991", "999992", "DFAULT")) |>
     pivot_longer(-`ECO#`) |>
     pivot_wider(names_from = `ECO#`) |>
@@ -25,5 +25,5 @@ prm_from_eco_file <- function(file_path){
                     psigma = psigma,
                     pdist = "normal"))
 
-  return(prm_tbl)
+  return(prm_df)
 }

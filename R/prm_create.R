@@ -51,7 +51,7 @@ prm_create <- function(pname,
     ungroup() |>
     select(-pmin, -pmax, -pmu, -psigma, -pdist) |>
     add_pregex() |>
-    as_prm_tbl()
+    as_prm_df()
 
   return(prm)
 

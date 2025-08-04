@@ -4,107 +4,107 @@
 #'
 #' @export
 #'
-prm_import_prm_tbl <- function(file_name){
+prm_import_prm_df <- function(file_name){
 
-  prm_tbl_csv <- read_csv(file_name)
+  prm_df_csv <- read_csv(file_name)
 
-  pname <- prm_tbl_csv |>
+  pname <- prm_df_csv |>
     pull(pname) |>
     as.character()
 
-  pfile <- prm_tbl_csv |>
+  pfile <- prm_df_csv |>
     pull(pfile) |>
     as.character()
 
-  if('pmin' %in% colnames(prm_tbl_csv)){
-    pmin <- prm_tbl_csv |>
+  if('pmin' %in% colnames(prm_df_csv)){
+    pmin <- prm_df_csv |>
       pull(pmin) |>
       as.numeric()
   }else{
     pmin <- -Inf
   }
 
-  if('pmax' %in% colnames(prm_tbl_csv)){
-    pmax <- prm_tbl_csv |>
+  if('pmax' %in% colnames(prm_df_csv)){
+    pmax <- prm_df_csv |>
       pull(pmax) |>
       as.numeric()
   }else{
     pmax <- Inf
   }
 
-  if('pmu' %in% colnames(prm_tbl_csv)){
-    pmu <- prm_tbl_csv |>
+  if('pmu' %in% colnames(prm_df_csv)){
+    pmu <- prm_df_csv |>
       pull(pmu) |>
       as.numeric()
   }else{
     pmu <- NA
   }
 
-  if('psigma' %in% colnames(prm_tbl_csv)){
-    psigma <- prm_tbl_csv |>
+  if('psigma' %in% colnames(prm_df_csv)){
+    psigma <- prm_df_csv |>
       pull(psigma) |>
       as.numeric()
   }else{
     psigma <- NA
   }
 
-  if('pdist' %in% colnames(prm_tbl_csv)){
-    pdist <- prm_tbl_csv |>
+  if('pdist' %in% colnames(prm_df_csv)){
+    pdist <- prm_df_csv |>
       pull(pdist) |>
       as.character()
   }else{
     pdist <- "unif"
   }
 
-  if('ptier' %in% colnames(prm_tbl_csv)){
-    ptier <- prm_tbl_csv |>
+  if('ptier' %in% colnames(prm_df_csv)){
+    ptier <- prm_df_csv |>
       pull(ptier) |>
       as.character()
   }else{
     ptier <- as.character(NA)
   }
 
-  if('pkey' %in% colnames(prm_tbl_csv)){
-    pkey <- prm_tbl_csv |>
+  if('pkey' %in% colnames(prm_df_csv)){
+    pkey <- prm_df_csv |>
       pull(pkey) |>
       as.character()
   }else{
     pkey <- as.character(NA)
   }
 
-  if('plev' %in% colnames(prm_tbl_csv)){
-    plev <- prm_tbl_csv |>
+  if('plev' %in% colnames(prm_df_csv)){
+    plev <- prm_df_csv |>
       pull(plev) |>
       as.numeric()
   }else{
     plev <- as.numeric(NA)
   }
 
-  if('pind' %in% colnames(prm_tbl_csv)){
-    pind <- prm_tbl_csv |>
+  if('pind' %in% colnames(prm_df_csv)){
+    pind <- prm_df_csv |>
       pull(pind) |>
       as.numeric()
   }else{
     pind <- as.numeric(NA)
   }
 
-  if('pnum' %in% colnames(prm_tbl_csv)){
-    pnum <- prm_tbl_csv |>
+  if('pnum' %in% colnames(prm_df_csv)){
+    pnum <- prm_df_csv |>
       pull(pnum) |>
       as.numeric()
   }else{
     pnum <- NULL
   }
 
-  if('pwt' %in% colnames(prm_tbl_csv)){
-    pwt <- prm_tbl_csv |>
+  if('pwt' %in% colnames(prm_df_csv)){
+    pwt <- prm_df_csv |>
       pull(pwt) |>
       as.numeric()
   }else{
     pwt <- NULL
   }
 
-  prm_tbl <- prm_create(pname = pname,
+  prm_df <- prm_create(pname = pname,
                         pfile = pfile,
                         pmin = pmin,
                         pmax = pmax,
@@ -118,6 +118,6 @@ prm_import_prm_tbl <- function(file_name){
                         pnum = pnum,
                         pwt = pwt)
 
-  return(prm_tbl)
+  return(prm_df)
 
 }

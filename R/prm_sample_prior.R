@@ -3,9 +3,9 @@
 #' @importFrom dplyr filter pull
 #' @importFrom purrr map_lgl map
 #'
-prm_sample_prior <- function(prm_tbl, n = 1){
+prm_sample_prior <- function(prm_df, n = 1){
 
-  samples <- prm_tbl |>
+  samples <- prm_df |>
     filter(!map_lgl(psampler, is.null)) |>
     pull(psampler) |>
     map(function(fun) fun(n)) |>

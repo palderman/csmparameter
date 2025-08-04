@@ -140,7 +140,7 @@ prm_add_transform <- function(prm_df, ptrans, pfile = "", ...){
                ...,
                stringsAsFactors = FALSE) |>
     add_pregex() |>
-    as_prm_tbl()
+    as_prm_df()
 
   # Add any transformed parameters to prm_df that are not
   #  already present

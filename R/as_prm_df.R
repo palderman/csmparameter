@@ -1,6 +1,6 @@
 #' @export
-as_prm_tbl <- function(tbl_in){
-  UseMethod("as_prm_tbl")
+as_prm_df <- function(df_in){
+  UseMethod("as_prm_df")
 }
 
 #'
@@ -8,17 +8,17 @@ as_prm_tbl <- function(tbl_in){
 #'
 #' @export
 #'
-as_prm_tbl.default <- function(tbl_in){
+as_prm_df.default <- function(df_in){
 
-  if(class(tbl_in)[1] != 'prm_tbl'){
+  if(class(df_in)[1] != 'prm_df'){
 
-    tbl_out <- as_tibble(tbl_in)
-    class(tbl_out) <- c('prm_tbl', class(tbl_in))
+    df_out <- as_tibble(df_in)
+    class(df_out) <- c('prm_df', class(df_in))
 
   }else{
 
-    tbl_out <- tbl_in
+    df_out <- df_in
 
   }
-  return(tbl_out)
+  return(df_out)
 }

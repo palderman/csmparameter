@@ -3,12 +3,12 @@
 #'
 #' @export
 #'
-prm_add <- function(.prm_tbl, ...){
+prm_add <- function(.prm_df, ...){
 
-  .prm_tbl <- prm_create(...) |>
-    (\(.x) full_join(.prm_tbl, .x)
+  .prm_df <- prm_create(...) |>
+    (\(.x) full_join(.prm_df, .x)
      )() |>
-    as_prm_tbl()
+    as_prm_df()
 
-  return(.prm_tbl)
+  return(.prm_df)
 }

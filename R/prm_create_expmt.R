@@ -1,3 +1,5 @@
+#' Create an experiment for parameter estimation
+#'
 #' @export
 #'
 #' @importFrom DSSAT read_filea read_filex read_filet write_filex
@@ -94,10 +96,10 @@ prm_create_expmt <- function(expmt, data){
   }
 
   expmt <- tibble(filex_name = filex_name, filex = list(filex),
-                  obs_tbl = list(joined_data), trno = list(trno),
+                  obs_df = list(joined_data), trno = list(trno),
                   data_types = list(data_types), sim_template = list(sim_template)) |>
-    add_output_tbl() |>
-    as_prm_expmt_tbl()
+    add_output_df() |>
+    as_prm_expmt_df()
 
   return(expmt)
 
