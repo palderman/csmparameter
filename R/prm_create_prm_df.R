@@ -50,7 +50,7 @@ prm_create_prm_df <- function(pname,
            ptransform = list(NULL)) |>
     ungroup() |>
     select(-pmin, -pmax, -pmu, -psigma, -pdist) |>
-    add_pregex() |>
+    prm_add_pregex() |>
     as_prm_df()
 
   return(prm)
