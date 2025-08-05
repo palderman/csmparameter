@@ -4,7 +4,7 @@
 #'
 #' @export
 #'
-prm_create <- function(pname,
+prm_create_prm_df <- function(pname,
                        pfile = NA,
                        pmin = -Inf,
                        pmax = Inf,
