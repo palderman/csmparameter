@@ -49,14 +49,14 @@ prm_create_prm_df <- function(pname,
   if(any(is.null(pname) | is.na(pname))) warning("pname cannot be NULL or missing")
   if(all(is.null(pmin))) pmin = -Inf
   if(all(is.null(pmax))) pmax = Inf
-  if(all(is.null(pmu))) pmu = NA
-  if(all(is.null(psigma))) psigma = NA
+  if(all(is.null(pmu))) pmu = NA_real_
+  if(all(is.null(psigma))) psigma = NA_real_
   if(all(is.null(pdist))) pdist = "uniform"
-  if(all(is.null(ptier))) ptier = as.character(NA)
-  if(all(is.null(pkey))) pkey = as.character(NA)
-  if(all(is.null(plev))) plev = as.numeric(NA)
-  if(all(is.null(pind))) pind = as.numeric(NA)
-  if(all(is.null(pnum))) pnum = 1:length(pname)
+  if(all(is.null(ptier))) ptier = NA_character_
+  if(all(is.null(pkey))) pkey = NA_character_
+  if(all(is.null(plev))) plev = NA_real_
+  if(all(is.null(pind))) pind = NA_real_
+  if(all(is.null(pnum))) pnum = seq_along(pname)
 
   prm <- data.frame(pname = pname, pmin = pmin, pmax = pmax, pmu = pmu,
                     psigma = psigma, pdist = pdist, pfile = pfile,
