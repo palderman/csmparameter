@@ -55,11 +55,12 @@ prior_lp <- sum(
   )
 )
 
-sd_tmp <- sapply(obs_df$variable, switch, "HWAM" = 250, "HIAM" = 0.025)
-
 log_likelihood <-
   obs_df |>
   merge(sim_df, all = TRUE) |>
+  within({
+    sd_tmp = sapply(variable, switch, "HWAM" = 250, "HIAM" = 0.025)
+  }) |>
   with(
     sum(dnorm(obs, mean = sim, sd = sd_tmp, log = TRUE))
   )
