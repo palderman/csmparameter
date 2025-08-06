@@ -22,5 +22,4 @@ Suggests:
     DEoptim,
     knitr,
     rmarkdown
-Config/testthat/edition: 3
 VignetteBuilder: knitr
