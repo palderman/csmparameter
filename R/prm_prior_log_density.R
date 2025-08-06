@@ -1,12 +1,14 @@
 prm_prior_log_density <- function(pval, prm_df){
 
-  pd_index <- which(!unlist(lapply(prm_df$pdensity, is.null)))
+  stopifnot(is.vector(pval) & is.atomic(pval))
+  stopifnot(is.data.frame(prm_df))
 
-  log_density <- 0
+  pval_df <- prm_pval_df(pval, prm_df)
 
-  for(i in seq_along(pval)){
-    log_density <- log_density + prm_df$pdensity[[pd_index[i]]](pval[i])
-  }
-
-  return(log_density)
+  with(pval_df,
+       mapply(.d = pdensity,
+              .v = pval,
+              \(.d, .v) .d(.v))) |>
+    unlist() |>
+    sum()
 }
