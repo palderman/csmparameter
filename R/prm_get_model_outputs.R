@@ -1,3 +1,5 @@
+#' Run model and return model outputs
+#'
 #' @export
 #'
 #' @importFrom dplyr  is_grouped_df group_by select group_map

@@ -6,7 +6,6 @@
 \usage{
 prm_add_variances(
   prm_df,
-  obs_df,
   pmin = 0,
   pmax = Inf,
   pmu = 0,
@@ -16,9 +15,22 @@ prm_add_variances(
 )
 }
 \arguments{
-\item{obs_df}{a tibble as produced by the create_expmt()
-function grouped by the factors which identify the observation
-groups for which a variance term should be estimated}
+\item{prm_df}{a data frame as created by \link{prm_create_prm_df}}
+
+\item{pmin}{a numeric vector providing the lower bound(s) for parameter(s) to
+be estimated. The default is -Inf (i.e. unbounded).}
+
+\item{pmax}{a numeric vector providing the upper bound(s) for parameter(s) to
+be estimated. The default is Inf (i.e. unbounded)}
+
+\item{pmu}{a numeric vector providing the mean(s) of the prior
+distribution(s) for parameter(s) to be estimated}
+
+\item{psigma}{a numeric vector providing the square root(s) of the
+variance(s) of the prior distribution(s) for parameter(s) to be estimated}
+
+\item{pdist}{a character vector providing the prior distribution(s) for
+parameter(s) to be estimated (one of "uniform" of "normal")}
 }
 \description{
 Add hyperparameters for variance terms ("model error") to prm_df

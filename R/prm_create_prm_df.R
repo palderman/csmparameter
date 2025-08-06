@@ -1,8 +1,35 @@
+#' Create a parameter data frame for estimation
 #'
 #' @importFrom dplyr  rowwise mutate ungroup select
 #' @importFrom tibble tibble
 #'
 #' @export
+#'
+#' @param pname a character vector providing the name(s) of parameter(s) to be
+#'  estimated
+#'
+#' @param pfile a character vector providing the file name(s) of the
+#'  parameter(s) to be estimated
+#'
+#' @param pmin a numeric vector providing the lower bound(s) for parameter(s) to
+#'  be estimated. The default is -Inf (i.e. unbounded).
+#'
+#' @param pmax a numeric vector providing the upper bound(s) for parameter(s) to
+#'  be estimated. The default is Inf (i.e. unbounded)
+#'
+#' @param pmu a numeric vector providing the mean(s) of the prior
+#'  distribution(s) for parameter(s) to be estimated
+#'
+#' @param psigma a numeric vector providing the square root(s) of the
+#'  variance(s) of the prior distribution(s) for parameter(s) to be estimated
+#'
+#' @param pdist a character vector providing the prior distribution(s) for
+#'  parameter(s) to be estimated (one of "uniform" of "normal")
+#'
+#' @param ptier an optional character vector providing the
+#'
+#' @param pkey an optional character vector providing the key value to use for
+#'  matching to an entry within \code{pfile}
 #'
 prm_create_prm_df <- function(pname,
                        pfile = NA,

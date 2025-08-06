@@ -2,19 +2,11 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr summarize mutate pull bind_rows bind_cols full_join
-#'   group_by groups
-#' @importFrom tidyr pivot_longer pivot_wider unite unnest
-#' @importFrom stringr str_c
-#' @importFrom tibble tibble
-#' @importFrom lubridate is.POSIXt
+#' @param prm_df a data frame as created by \link{prm_create_prm_df}
 #'
-#' @param obs_df a tibble as produced by the create_expmt()
-#'  function grouped by the factors which identify the observation
-#'  groups for which a variance term should be estimated
+#' @inheritParams prm_create_prm_df
 #'
 prm_add_variances <- function(prm_df,
-                              obs_df,
                               pmin = 0,
                               pmax = Inf,
                               pmu = 0,
@@ -22,54 +14,49 @@ prm_add_variances <- function(prm_df,
                               pdist = "normal",
                               ...){
 
-  prior_df <- tibble(pmin = pmin,
-                    pmax = pmax,
-                    pmu = pmu,
-                    psigma = psigma,
-                    pdist = pdist,
-                    ...) |>
-    # Join prior data with obs_df and suppress message
-    (\(.x) suppressMessages(full_join(.x, obs_df))
-     )() |>
-    # Impose grouping structure from obs_df on var_df
-    (\(.x) do.call(group_by, c(list(.x), groups(obs_df)))
-     )() |>
-    summarize(across(c(pmin, pmax, pmu, psigma, pdist), unique))
+  dots_list <- list(...)
 
-  var_df <- obs_df |>
-    # Drop non-grouping variables
-    summarize() |>
-    ungroup() |>
-    # Convert all grouping variables to character
-    mutate(across(where(is.POSIXt), ~format(., "%Y-%j")),
-           across(where(~{!is.character(.)}), as.character)) |>
-    # Stack all grouping variables
-    pivot_longer(everything()) |>
-    # Append variable name to value
-    mutate(value = str_c(name, value, sep = ":")) |>
-    # Unstack appended grouping variables
-    pivot_wider(values_fn = list) |>
-    unnest(everything()) |>
-    # Unite grouping variables into single pname column
-    unite(pname, everything(), sep = ";") |>
-    # Prepend pname with variance label
-    mutate(pname = str_c("variance;", pname)) |>
-    # Combine with tibble with prior information
-    bind_cols(prior_df)
+  var_df <- data.frame(pmin = pmin,
+                       pmax = pmax,
+                       pmu = pmu,
+                       psigma = psigma,
+                       pdist = pdist,
+                       ...) |>
+    unique()
+
+  # Convert all grouping variables to character
+  for(nm in names(dots_list)){
+    if("POSIXt" %in% class(var_df[[nm]])){
+      var_df[[nm]] <- format(var_df[[nm]], "%Y-%m-%d")
+    }else if(!is.character(var_df[[nm]])){
+      var_df[[nm]] <- as.character(var_df[[nm]])
+    }
+  }
+
+  var_df$pname <-
+    names(dots_list) |>
+    lapply(\(.nm){
+      paste0(.nm, ":", var_df[[.nm]])
+    }) |>
+    c(collapse = ";") |>
+    do.call(paste0, args = _) |>
+    paste0("sigma;", x = _)
 
   output <- var_df |>
     # Create parameter table for variance parameters
-    with(prm_create(pname = pname,
-                    pfile = "",
-                    pmin = pmin,
-                    pmax = pmax,
-                    pmu = pmu,
-                    psigma = psigma,
-                    pdist = pdist,
-                    pnum = max(prm_df$pnum)+(1:length(pname)))) |>
+    with({
+      prm_create_prm_df(pname = pname,
+                        pfile = "",
+                        pmin = pmin,
+                        pmax = pmax,
+                        pmu = pmu,
+                        psigma = psigma,
+                        pdist = pdist,
+                        pnum = max(prm_df$pnum)+seq_along(pname))
+    }) |>
     # Combine variance parameter table with original prm_df
-    (\(.x) bind_rows(prm_df, .x)
-     )()
+    list(x = prm_df, y = _) |>
+    do.call(rbind, args = _)
 
   return(output)
 }
