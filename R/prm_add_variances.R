@@ -38,9 +38,8 @@ prm_add_variances <- function(prm_df,
     lapply(\(.nm){
       paste0(.nm, ":", var_df[[.nm]])
     }) |>
-    c(collapse = ";") |>
-    do.call(paste0, args = _) |>
-    paste0("sigma;", x = _)
+    c("sigma_r", x = _, sep = ";") |>
+    do.call(paste, args = _)
 
   output <- var_df |>
     # Create parameter table for variance parameters
