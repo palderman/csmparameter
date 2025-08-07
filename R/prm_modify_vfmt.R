@@ -1,6 +1,4 @@
 #'
-#' @importFrom stringr str_extract str_remove
-#'
 #' @export
 #'
 prm_modify_vfmt <- function(.input, pname, pfmt){
@@ -8,8 +6,10 @@ prm_modify_vfmt <- function(.input, pname, pfmt){
   v_fmt <- attr(.input,'v_fmt')
 
   widths <- pfmt |>
-    str_extract('(?<=%)-*[0-9]+') |>
-    str_remove('-') |>
+    gregexpr("(?<=%)-*[0-9]+",
+             text = _) |>
+    regmatches(pfmt, m = _) |>
+    gsub("-", "", x = _) |>
     as.numeric()
 
   v_fmt[pname] <- str_c('%',widths,'s')
