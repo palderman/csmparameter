@@ -10,12 +10,12 @@ prm_create_prm_est(
   prm_df,
   obj_fun,
   model_type = "DSSAT-CSM",
-  dssat_call
+  model_call
 )
 }
 \arguments{
 \item{expmt_df}{a data frame of experiment definitions as created by
-\link[csmparameter]{prm_create_expmt_df}}
+\link{prm_create_expmt_df}}
 
 \item{inp_df}{a data frame of input definitions as created by
 \link{prm_create_inp_df}}
