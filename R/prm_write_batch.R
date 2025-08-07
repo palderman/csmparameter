@@ -1,16 +1,15 @@
 #'
-#' @importFrom dplyr  select
-#' @importFrom tidyr unnest
-#' @importFrom DSSAT write_dssbatch
-#'
 #' @export
 #'
 prm_write_batch.expmt_df <- function(expmt_df){
 
   expmt_df |>
-    select(filex_name,trno) |>
-    unnest(trno) |>
-    (\(.x) write_dssbatch(x = .x$filex_name, trtno = .x$trno)
-     )()
+    subset(select = c("filex_name", "trno")) |>
+    with({
+      setNames(trno, filex_name) |>
+        stack() |>
+        setNames(c("trno", "filex_name"))
+    }) |>
+    with(DSSAT::write_dssbatch(x = filex_name, trtno = trno))
 
 }
