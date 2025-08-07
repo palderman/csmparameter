@@ -1,80 +1,109 @@
 #' @export
 #'
-#' @importFrom dplyr  group_by mutate filter full_join left_join group_map
-#'   n ungroup select pull rename_with bind_rows
-#' @importFrom purrr reduce
-#' @importFrom tibble add_column
-#' @importFrom stringr str_detect
-#' @importFrom tidyr pivot_longer unnest
-#'
 prm_read_sim <- function(run_df){
 
-  if(nrow(run_df$sim_template[[1]]) > 0){
+  sim_template <-
+    run_df[["sim_template"]] |>
+    Reduce(f = rbind,
+           x = _)
 
-    run_expmt <- run_df |>
-      select(sim_template) |>
-      unnest(sim_template) |>
-      group_by(EXPERIMENT,TRNO) |>
-      summarize() |>
-      ungroup() |>
-      mutate(RUN = 1:n(),
-             RUNNO = RUN)
+  if(nrow(sim_template) > 0){
 
-    all_cols <- run_df |>
-      ungroup() |>
-      select(out_df) |>
-      unnest(out_df) |>
-      pull(col_names)
+    run_expmt <-
+      sim_template |>
+      subset(select = c("EXPERIMENT", "TRNO")) |>
+      unique() |>
+      within({
+        RUN = seq_along(EXPERIMENT)
+        RUNNO = RUN
+      })
 
-    out_df <- run_df |>
-      ungroup() |>
-      select(out_df) |>
-      unnest(out_df)
+    out_df <-
+      run_df[["out_df"]] |>
+      Reduce(f = rbind,
+             x = _)
+
+    all_cols <-
+      with(out_df,
+           col_names)
 
     # Reject if any output file is missing
     # This assumes that if any output file is missing the simulation failed
     if(all(file.exists(out_df$file_name))){
-      out <- out_df |>
-        group_by(file_name) |>
-        group_map(~{
-          # read_output(.y$file_name,read_only = c('TRNO','DATE','RUN','RUNNO',.x$col_names)) |>
-          read_output(.y$file_name) |>
-          (\(.x){
-            if( ! 'DATE' %in% names(.x)){
-              .x <- add_column(.x, DATE = as.POSIXct('0001001',format='%Y%j',tz='UTC'))
-            }
-            .x
-            })() |>
-            filter(TRNO %in% run_df$sim_template[[1]]$TRNO &
-                   DATE %in% run_df$sim_template[[1]]$DATE) |>
-            rename_with(~str_replace(.,'RUNNO','RUN')) |>
-            select(-matches("(EXPERIMENT)|(MODEL)")) |>
-            full_join(run_expmt) |>
-            select(any_of(c("EXPERIMENT", "TRNO", "DATE", all_cols))) |>
-            pivot_longer(names_to = "variable",
-                         values_to = "sim",
-                         cols = any_of(all_cols))
-        }) |>
-        bind_rows() |>
-        (\(.x) left_join(run_df$sim_template[[1]], .x)
-         )() |>
-        mutate(sim = ifelse(str_detect(variable,'DAT$'),
-                            as.numeric(difftime(as.POSIXct(sim,tz='UTC',origin='1970-01-01'),
-                                                PDATE,
-                                                units="days")),
-                            sim)) |>
-        select(-PDATE)
+
+      out <-
+        out_df[["file_name"]] |>
+        unique() |>
+        lapply(\(.fn) read_model_output(.fn,
+                                        sim_template,
+                                        run_expmt,
+                                        all_cols)) |>
+        do.call(rbind, args = _) |>
+        merge(sim_template, all.x = TRUE) |>
+        within({
+          sim = ifelse(grepl("DAT$", variable),
+                       as.POSIXct(sim, tz='UTC', origin='1970-01-01') |>
+                         difftime(PDATE, units="days") |>
+                         as.numeric(),
+                       sim)
+        })
+
       }else{
-        out <- run_df$sim_template[[1]] |>
-          mutate(sim = NA_real_) |>
-          select(-PDATE)
+
+        out <- sim_template
+
+        out[["sim"]] <- NA_real_
+
       }
   }else{
-    out <- run_df$sim_template[[1]] |>
-      mutate(sim = vector("numeric")) |>
-      select(-PDATE)
+
+    out <- sim_template
+
+    out[["sim"]] <- NA_real_
+
   }
 
+  out[["PDATE"]] <- NULL
+
   return(out)
+
+}
+
+read_model_output <- function(file_name, sim_template, run_expmt, all_cols){
+
+  raw_output <- read_output(file_name)
+
+  if(! "DATE" %in% names(raw_output)){
+    raw_output[["DATE"]] <- as.POSIXct('0001001',format='%Y%j',tz='UTC')
+  }
+
+  merged_output <-
+    raw_output |>
+    subset(TRNO %in% sim_template$TRNO &
+           DATE %in% sim_template$DATE) |>
+    df_rename(RUN = "RUNNO") |>
+    select(-matches("(EXPERIMENT)|(MODEL)")) |>
+    merge(run_expmt, all = TRUE)
+
+  select_cols <-
+    all_cols |>
+    c("EXPERIMENT", "TRNO", "DATE") |>
+    paste0(collapse = "|") |>
+    paste0("(", x = _, ")") |>
+    grep(x = colnames(merged_output),
+         values = TRUE)
+
+  stack_cols <-
+    select_cols |>
+    grep(pattern = "(EXPERIMENT|TRNO|DATE)",
+         x = _,
+         values = TRUE,
+         invert = TRUE)
+
+  merged_output |>
+    subset(select = select_cols) |>
+    stack(select = stack_cols) |>
+    df_rename(sim = "values",
+              variable = "ind")
 
 }
