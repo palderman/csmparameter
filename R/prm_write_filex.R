@@ -1,16 +1,19 @@
-#' @importFrom dplyr  group_by group_walk
-#' @importFrom DSSAT write_filex
-#'
 prm_write_filex <- function(.expmt_df){
 
-  .expmt_df |>
-    group_by(filex_name) |>
-    group_walk(~{
-      if('VBOSE' %in% colnames(.x$filex[[1]]$`SIMULATION CONTROLS`)){
-        .x$filex[[1]]$`SIMULATION CONTROLS`$VBOSE <- 'N'
-      }else if('LONG' %in% colnames(.x$filex[[1]]$`SIMULATION CONTROLS`)){
-        .x$filex[[1]]$`SIMULATION CONTROLS`$LONG <- 'N'
-      }
-      write_filex(.x$filex[[1]],.y$filex_name)})
+  .expmt_df[["filex_name"]] |>
+    lapply(\(.filex){
+      .expmt_df |>
+        subset(filex_name == .filex) |>
+        with({
+          filex_write <- filex |>
+            unlist(recursive = FALSE)
+          if('VBOSE' %in% colnames(filex_write$`SIMULATION CONTROLS`)){
+            filex_write$`SIMULATION CONTROLS`$VBOSE <- 'N'
+          }else if('LONG' %in% colnames(filex_write$`SIMULATION CONTROLS`)){
+            filex_write$`SIMULATION CONTROLS`$LONG <- 'N'
+          }
+          DSSAT::write_filex(filex_write, .filex)
+        })
+    })
 
 }
