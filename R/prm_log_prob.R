@@ -1,8 +1,5 @@
 #' @export
 #'
-#' @importFrom tibble add_column
-#' @importFrom dplyr full_join mutate
-#'
 prm_log_prob <- function(obs_df, sim_df, prm_df, pval){
 
   if(prm_check_sim(sim_df)){
