@@ -1,15 +1,14 @@
 #' Add regular expressions for parameters
 #'
-#' @importFrom dplyr  ungroup mutate
-#' @importFrom stringr str_extract str_remove
-#'
 #' @export
 #'
 prm_add_pregex <- function(.prm_df){
 
-  widths <- .prm_df$pfmt |>
-    str_extract('(?<=%)-*[0-9]+') |>
-    str_remove('-') |>
+  widths <-
+    .prm_df[["pfmt"]] |>
+    gregexpr("(?<=%)-*[0-9]+", text = _) |>
+    regmatches(.prm_df[["pfmt"]], m = _) |>
+    gsub("-", "", x = _) |>
     as.numeric()
 
   if(length(widths > 0)){
