@@ -1,8 +1,5 @@
 #' Create a parameter data frame for estimation
 #'
-#' @importFrom dplyr  rowwise mutate ungroup select
-#' @importFrom tibble tibble
-#'
 #' @export
 #'
 #' @param pname a character vector providing the name(s) of parameter(s) to be
@@ -62,21 +59,26 @@ prm_create_prm_df <- function(pname,
                     psigma = psigma, pdist = pdist, pfile = pfile,
                     ptier = ptier, pkey = pkey, plev = plev, pind = pind,
                     pnum = pnum, pfmt = pfmt) |>
-    mutate(across(c(ptier, pkey), as.character)) |>
-    rowwise() |>
-    mutate(pdensity = list(prm_prior_density_function(pmin = pmin,
-                                                      pmax = pmax,
-                                                      pmu = pmu,
-                                                      psigma = psigma,
-                                                      pdist = pdist)),
-           psampler = list(prm_prior_sampler_function(pmin = pmin,
-                                                     pmax = pmax,
-                                                     pmu = pmu,
-                                                     psigma = psigma,
-                                                     pdist = pdist)),
-           ptransform = list(NULL)) |>
-    ungroup() |>
-    select(-pmin, -pmax, -pmu, -psigma, -pdist) |>
+    within({
+      ptier = as.character(ptier)
+      pkey = as.character(pkey)
+      pdensity = mapply(prm_prior_density_function,
+                        pmin = pmin,
+                        pmax = pmax,
+                        pmu = pmu,
+                        psigma = psigma,
+                        pdist = pdist,
+                        SIMPLIFY = FALSE)
+      psampler = mapply(prm_prior_sampler_function,
+                        pmin = pmin,
+                        pmax = pmax,
+                        pmu = pmu,
+                        psigma = psigma,
+                        pdist = pdist,
+                        SIMPLIFY = FALSE)
+      ptransform = lapply(pname, \(.x) NULL)
+    }) |>
+    subset(select = -c(pmin, pmax, pmu, psigma, pdist)) |>
     prm_add_pregex() |>
     as_prm_df()
 
