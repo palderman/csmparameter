@@ -4,15 +4,13 @@ as_prm_df <- function(df_in){
 }
 
 #'
-#' @importFrom tibble as_tibble
-#'
 #' @export
 #'
 as_prm_df.default <- function(df_in){
 
   if(class(df_in)[1] != 'prm_df'){
 
-    df_out <- as_tibble(df_in)
+    df_out <- as.data.frame(df_in)
     class(df_out) <- c('prm_df', class(df_in))
 
   }else{
