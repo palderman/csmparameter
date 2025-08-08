@@ -2,10 +2,6 @@
 #'
 #' @export
 #'
-#' @importFrom tibble tibble
-#' @importFrom dplyr  group_by group_map bind_rows
-#' @importFrom purrr map
-#'
 #' @param expmt either a vector of file names of DSSAT-formatted experiment
 #'   files (File X) or a list each element of which is a list as would be
 #'    returned by \link[DSSAT]{read_filex} or \link[DSSAT]{filex_template}.
@@ -18,22 +14,22 @@
 #'
 prm_create_expmt_df <- function(expmt, trno = NULL, variables = NULL){
 
-  if(is.null(trno)) trno <- lapply(1:length(expmt), ~{NULL})
-  if(is.null(variables)) variables <- lapply(1:length(expmt), ~{NULL})
+  if(is.null(trno)) trno <- rep(list(NULL), length(expmt))
+  if(is.null(variables)) variables <- rep(list(NULL), length(expmt))
 
-  expmt_trno_df <- tibble(expmt_index = 1:length(expmt),
-                           expmt = expmt,
-                           trno = trno,
-                           variables = variables)
+  expmt_trno_df <- data.frame(expmt_index = seq_along(expmt),
+                              expmt = expmt,
+                              trno = trno,
+                              variables = variables)
 
-  expmt_df <-
-    filex_trno_df |>
-    group_by(expmt_index) |>
-    group_map(~prm_create_expmt(expmt = .x$expmt[[1]],
-                                  trno = .x$trno[[1]],
-                                  data_types = .x$data_types[[1]],
-                                  rewrite_filex = rewrite_filex)) |>
-      bind_rows()
+  filex_trno_df |>
+    with({
+      mapply(prm_create_expmt,
+             expmt = expmt,
+             trno = trno,
+             data_types = data_types,
+             rewrite_filex = rewrite_filex)
+    }) |>
+    do.call(rbind, args = _)
 
-  return(expmt_df)
 }
