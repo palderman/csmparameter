@@ -1,15 +1,19 @@
 #' Add parameter format
 #'
-#' @importFrom dplyr group_by  group_map rowwise mutate
-#'
 #' @export
 #'
 prm_add_pfmt <- function(.prm_df, input_df){
 
-  v_fmt <- group_by(input_df,file_name) |>
-    group_map(~attr(.$file_processed[[1]],'v_fmt'))
+  v_fmt <-
+    input_df |>
+    by(~file_name,
+       \(.x){
+         .x[["file_processed"]] |>
+           unlist(recursive = FALSE) |>
+           attr("v_fmt")},
+       simplify = FALSE)
 
-  names(v_fmt) <- input_df$file_name
+  names(v_fmt) <- input_df[["file_name"]]
 
   .prm_df$pfmt <- NA_character_
 
