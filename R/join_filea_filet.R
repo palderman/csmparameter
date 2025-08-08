@@ -1,13 +1,12 @@
-#'
-#' @importFrom dplyr  mutate full_join
-#'
 join_filea_filet <- function(filea=NULL,filet=NULL){
   if(!is.null(filea)){
     filea <- filea |>
-      mutate(DATE = as.POSIXct('0001001',format='%Y%j',tz='UTC'))
+      within({
+        DATE = as.POSIXct('0001001', format='%Y%j', tz='UTC')
+      })
   }
   if(!is.null(filet) & !is.null(filea)){
-    joined_data <- full_join(filea, filet)
+    joined_data <- merge(filea, filet, all = TRUE)
   }else if(!is.null(filet)){
     joined_data <- filet
   }else{
