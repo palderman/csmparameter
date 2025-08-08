@@ -1,28 +1,32 @@
-#'
-#' @importFrom purrr map_lgl
-#' @importFrom stringr str_detect str_replace
-#' @importFrom lubridate is.POSIXct
-#' @importFrom dplyr  left_join mutate_if select
-#'
 dat_to_dap <- function(pdate,.data){
 
-  dat_cols <- map_lgl(.data,~is.POSIXct(.)) & !str_detect(colnames(.data),'^DATE$')
+  dat_cols <- sapply(.data, \(.x) "POSIXt" %in% class(.x)) &
+    ! grepl("^DATE$", colnames(.data))
 
   if(any(dat_cols)){
+
     dat_cnames <- colnames(.data)[dat_cols]
-    .data <- .data |>
-      left_join(pdate) |>
-      (\(.x)
-      mutate_if(.x,
-                colnames(.x) %in% dat_cnames,
-                ~{as.numeric(difftime(., PDATE,units='days'))})
-      )() |>
-      select(-PDATE)
+
+    .data <-
+      .data |>
+      merge(pdate, all.x = TRUE)
+
+    for(i in seq_along(.data)){
+      if(colnames(.data)[i] %in% dat_cnames){
+        .data[[i]] <-
+          .data[[i]] |>
+          difftime(PDATE, units='days') |>
+          as.numeric()
+      }
+    }
+
+    .data[["PDATE"]] <- NULL
 
     cnames <- colnames(.data)
 
-    cnames[cnames %in% dat_cnames] <- cnames[cnames %in% dat_cnames] |>
-      str_replace('T$','P')
+    cnames[cnames %in% dat_cnames] <-
+      cnames[cnames %in% dat_cnames] |>
+      gsub('T$','P', x = _)
 
     colnames(.data) <- cnames
   }
