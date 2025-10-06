@@ -21,7 +21,7 @@ expect_identical(new_df[["pname"]],
                  info = "pname")
 
 expect_identical(new_df[["pfile"]],
-                 c("WHCER048.CUL", rep("", 4)),
+                 c("WHCER048.CUL", rep(NA_character_, 4)),
                  info = "pfile")
 
 density_1000 <- csmparameter:::normal_prior_density(0, Inf, 0, 1000)
@@ -43,3 +43,4 @@ expect_identical(sapply(new_df[["pdensity"]],function(x) x(3.)),
                  c(prm_df$pdensity[[1]](3.),
                    rep(c(density_1000(3.),
                          density_pt1(3.)), 2)))
+

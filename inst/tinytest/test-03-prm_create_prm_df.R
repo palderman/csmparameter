@@ -9,7 +9,6 @@ actual <- csmparameter::prm_create_prm_df(pname = "G1",
                                           psigma = 5,
                                           pdist = "normal",
                                           pfile = "WHCER048.CUL",
-                                          ptier = NA,
                                           pkey = "IB0001")
 
 expect_identical(getElement(actual,"pname"),
@@ -33,20 +32,8 @@ expect_identical(getElement(actual,"pdist"),
 expect_identical(getElement(actual,"pfile"),
                  "WHCER048.CUL")
 
-expect_identical(getElement(actual,"ptier"),
-                 NA_character_)
-
 expect_identical(getElement(actual,"pkey"),
                  "IB0001")
-
-expect_identical(getElement(actual,"plev"),
-                 NA_integer_)
-
-expect_identical(getElement(actual,"pind"),
-                 NA_integer_)
-
-expect_identical(getElement(actual,"pnum"),
-                 1L)
 
 expect_equivalent(getElement(actual, "pdensity"),
                  list(csmparameter:::prm_prior_density_function(
@@ -75,7 +62,6 @@ actual <- csmparameter::prm_create_prm_df(pname = c("G1", "G2", "G3"),
                                           psigma = c(5, 11, 6.2),
                                           pdist = "normal",
                                           pfile = "WHCER048.CUL",
-                                          ptier = NA,
                                           pkey = "IB0001")
 
 expect_identical(getElement(actual,"pname"),
@@ -99,20 +85,8 @@ expect_identical(getElement(actual,"pdist"),
 expect_identical(getElement(actual,"pfile"),
                  rep("WHCER048.CUL", 3))
 
-expect_identical(getElement(actual,"ptier"),
-                 rep(NA_character_, 3))
-
 expect_identical(getElement(actual,"pkey"),
                  rep("IB0001", 3))
-
-expect_identical(getElement(actual,"plev"),
-                 rep(NA_integer_, 3))
-
-expect_identical(getElement(actual,"pind"),
-                 rep(NA_integer_, 3))
-
-expect_identical(getElement(actual,"pnum"),
-                 1L:3L)
 
 expect_equivalent(getElement(actual, "pdensity"),
                  list(
@@ -157,3 +131,4 @@ expect_equivalent(getElement(actual, "psampler"),
                      psigma = 6.2,
                      pdist = "normal")
                  ))
+

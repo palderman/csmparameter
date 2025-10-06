@@ -12,7 +12,6 @@ set.seed(1234)
 
 prm_df <-
   csmparameter::prm_create_prm_df(pname = c("p1_latent", "p2", "p3"),
-                                  pfile = "",
                                   pmu = 0,
                                   psigma = 1,
                                   pdist = "normal")

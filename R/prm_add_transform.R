@@ -90,7 +90,7 @@ ptrans_get_body <- function(expr){
 #'
 #' @export
 #'
-prm_add_transform <- function(prm_df, ptrans, pfile = "", ...){
+prm_add_transform <- function(prm_df, ptrans, ...){
 
   if(!is.expression(ptrans)) ptrans <- as.expression(ptrans)
 
@@ -157,7 +157,9 @@ prm_add_transform <- function(prm_df, ptrans, pfile = "", ...){
                             prm_df$pname)
 
   # Add pfile to corresponding rows
-  prm_df$pfile[ptrans_ind] <- pfile
+  if("pfile" %in% names(prm_df)){
+    prm_df$pfile[ptrans_ind] <- pfile
+  }
 
   # Add transform functions to corresponding rows
   prm_df$ptransform[ptrans_ind] <- fun_list

@@ -31,6 +31,8 @@ variance(s) of the prior distribution(s) for parameter(s) to be estimated}
 
 \item{pdist}{a character vector providing the prior distribution(s) for
 parameter(s) to be estimated (one of "uniform" of "normal")}
+
+\item{...}{other arguments used to uniquely identify the parameter}
 }
 \description{
 Add hyperparameters for variance terms ("model error") to prm_df

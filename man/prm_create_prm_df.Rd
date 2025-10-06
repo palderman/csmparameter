@@ -6,27 +6,18 @@
 \usage{
 prm_create_prm_df(
   pname,
-  pfile = NA,
   pmin = -Inf,
   pmax = Inf,
   pmu = NA_real_,
   psigma = NA_real_,
   pdist = "uniform",
-  ptier = NA_character_,
-  pkey = NA_character_,
-  plev = NA_integer_,
-  pind = NA_integer_,
   pfmt = NA_character_,
-  pnum = NULL,
-  pwt = NULL
+  ...
 )
 }
 \arguments{
 \item{pname}{a character vector providing the name(s) of parameter(s) to be
 estimated}
-
-\item{pfile}{a character vector providing the file name(s) of the
-parameter(s) to be estimated}
 
 \item{pmin}{a numeric vector providing the lower bound(s) for parameter(s) to
 be estimated. The default is -Inf (i.e. unbounded).}
@@ -43,10 +34,7 @@ variance(s) of the prior distribution(s) for parameter(s) to be estimated}
 \item{pdist}{a character vector providing the prior distribution(s) for
 parameter(s) to be estimated (one of "uniform" of "normal")}
 
-\item{ptier}{an optional character vector providing the}
-
-\item{pkey}{an optional character vector providing the key value to use for
-matching to an entry within \code{pfile}}
+\item{...}{other arguments used to uniquely identify the parameter}
 }
 \description{
 Create a parameter data frame for estimation

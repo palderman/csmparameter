@@ -45,17 +45,19 @@ prm_add_variances <- function(prm_df,
     # Create parameter table for variance parameters
     with({
       prm_create_prm_df(pname = pname,
-                        pfile = "",
                         pmin = pmin,
                         pmax = pmax,
                         pmu = pmu,
                         psigma = psigma,
-                        pdist = pdist,
-                        pnum = max(prm_df$pnum)+seq_along(pname))
+                        pdist = pdist)
+    }) |>
+    within({
+      pnum = pnum + max(prm_df$pnum)
     }) |>
     # Combine variance parameter table with original prm_df
-    list(x = prm_df, y = _) |>
-    do.call(rbind, args = _)
+    list(x = prm_df, y = _, all = TRUE) |>
+    do.call(merge, args = _) |>
+    arrange_df("pnum")
 
   return(output)
 }

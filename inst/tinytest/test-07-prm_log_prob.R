@@ -41,7 +41,6 @@ prm_df <-
                                   psigma = c(5, 11, 6.2),
                                   pdist = "normal",
                                   pfile = "WHCER048.CUL",
-                                  ptier = NA,
                                   pkey = "IB0001") |>
   csmparameter::prm_add_variances(psigma = c(250, 0.025),
                                   variable = c("HWAM", "HIAM"))
@@ -74,3 +73,4 @@ expect_identical(
   csmparameter::prm_log_prob(obs_df, sim_df, prm_df, pval),
   prior_lp + log_likelihood,
   info = "prm_log_prob()")
+
