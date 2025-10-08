@@ -21,6 +21,8 @@ prm_log_prob <- function(obs_df, sim_df, prm_df, pval){
 
     lp <- prior_lp + log_likelihood
 
+    if(is.infinite(lp)) lp <- -.Machine$double.xmax
+
   }else{
 
     lp <- -.Machine$double.xmax
