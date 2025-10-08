@@ -91,13 +91,13 @@ read_model_output <- function(file_name, sim_template, run_expmt, all_cols){
     paste0(collapse = "|") |>
     paste0("(", x = _, ")") |>
     grep(x = colnames(merged_output),
-         values = TRUE)
+         value = TRUE)
 
   stack_cols <-
     select_cols |>
     grep(pattern = "(EXPERIMENT|TRNO|DATE)",
          x = _,
-         values = TRUE,
+         value = TRUE,
          invert = TRUE)
 
   merged_output |>

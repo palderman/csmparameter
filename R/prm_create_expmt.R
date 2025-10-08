@@ -25,7 +25,7 @@ prm_create_expmt <- function(expmt, data){
       colnames() |>
       grep("^(TRNO|DATE)$",
            x = _,
-           invert = TRUE, values = TRUE)
+           invert = TRUE, value = TRUE)
     if(any(grepl("DAT$", colnames(filea)))){
       if(!exists('filex', envir = environment(fun = NULL))){
         filex <- DSSAT::read_filex(filex_name)
