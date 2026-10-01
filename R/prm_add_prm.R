@@ -14,5 +14,5 @@ prm_add_prm <- function(.prm_df, ...){
     merge(.prm_df, y = _, all = TRUE) |>
     as_prm_df()
 
-  return(.prm_df)
+  standardize_column_order(.prm_df)
 }

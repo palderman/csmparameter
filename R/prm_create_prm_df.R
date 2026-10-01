@@ -62,6 +62,6 @@ prm_create_prm_df <- function(pname,
     prm_add_pregex() |>
     as_prm_df()
 
-  return(prm)
+  standardize_column_order(prm)
 
 }

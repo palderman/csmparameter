@@ -67,5 +67,6 @@ prm_sigma_r_df <- function(pval_df){
     }
   }
 
-  sigma_r_df
+  sigma_r_df |>
+    subset(select = c("pname", "pval", new_col_names))
 }

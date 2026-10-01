@@ -2,7 +2,7 @@
 #'
 #' @export
 #'
-#' @param prm_est a named list created using [create_prm_est]
+#' @param prm_est a named list created using [prm_create_prm_est]
 #'
 #' @param control a named list created using \link[DEoptim]{DEoptim.control}() from the
 #'  DEoptim package (See \link[DEoptim]{DEoptim.control} for details)

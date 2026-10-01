@@ -96,38 +96,10 @@ prm_add_transform <- function(prm_df, ptrans, ...){
 
   prm_df$pnum <- 1:nrow(prm_df)
 
-  fun_list <- lapply(as.list(ptrans), function(ptr){
-
-    pname <- ptrans_get_pname(ptr)
-
-    arg_list <- ptrans_get_arg_list(ptr)
-
-    if(pname %in% arg_list){
-      stop(
-        paste0(pname,
-              " found in the parameter transform expression: ",
-              deparse(ptr),
-              "\n Please create a corresponding latent variable (e.g. ",
-              pname, "_latent).")
-        )
-    }
-
-    ptrans_df <- data.frame(pname = arg_list,
-                            arg_num = 1:length(arg_list),
-                            ...,
-                            stringsAsFactors = FALSE)
-
-    pind <- with(
-      merge(prm_df, ptrans_df, all.y = TRUE),
-      pnum[order(arg_num)]
-      )
-
-    body <- ptrans_get_body(ptr)
-
-    fun <- ptrans_fun(arg_list, body, pind)
-
-    return(fun)
-  })
+  fun_df <- lapply(as.list(ptrans), create_transform_function,
+                   prm_df = prm_df, ...) |>
+    Reduce(x = _,
+           f = \(.x, .y) merge(.x, .y, all = TRUE))
 
   if(! "ptransform" %in% colnames(prm_df)){
     prm_df$ptransform <- vector(mode = "list", length = nrow(prm_df))
@@ -140,35 +112,148 @@ prm_add_transform <- function(prm_df, ptrans, ...){
                ...,
                stringsAsFactors = FALSE) |>
     prm_add_pregex() |>
-    as_prm_df()
+    within({
+      pdensity = rep(list(NULL), length(pname))
+      psampler = rep(list(NULL), length(pname))
+    }) |>
+    merge(fun_df)
 
   # Add any transformed parameters to prm_df that are not
   #  already present
   prm_df <- merge(prm_df,
                   ptrans_df,
-                  all = TRUE)
+                  all = TRUE,
+                  sort = FALSE)
 
   # Sort by pnum
   prm_df <- arrange_df(prm_df, "pnum")
   prm_df <- prm_fill_in_pnum(prm_df)
 
   # Find row index for transformed parameters in prm_df
-  ptrans_ind <- ptrans_find(ptrans_get_pname(as.list(ptrans)),
-                            prm_df$pname)
+  # ptrans_ind <- ptrans_find(ptrans_get_pname(as.list(ptrans)),
+  #                           prm_df$pname)
 
   # Add pfile to corresponding rows
-  if("pfile" %in% names(prm_df)){
-    prm_df$pfile[ptrans_ind] <- pfile
-  }
+  # if("pfile" %in% names(prm_df)){
+  #   prm_df$pfile[ptrans_ind] <- pfile
+  # }
 
   # Add transform functions to corresponding rows
-  prm_df$ptransform[ptrans_ind] <- fun_list
+  # prm_df$ptransform[ptrans_ind] <- fun_list
 
   # nullify density functions for transformed parameters
-  prm_df$pdensity[ptrans_ind] <- rep(list(NULL), length(ptrans_ind))
+  # prm_df$pdensity[ptrans_ind] <- rep(list(NULL), length(ptrans_ind))
 
   # nullify prior sample functions for transformed parameters
-  prm_df$psampler[ptrans_ind] <- rep(list(NULL), length(ptrans_ind))
+  # prm_df$psampler[ptrans_ind] <- rep(list(NULL), length(ptrans_ind))
 
-  return(prm_df)
+  prm_df |>
+    as_prm_df() |>
+    standardize_column_order()
+}
+
+create_transform_function <- function(ptr, prm_df, ...){
+
+  pname <- ptrans_get_pname(ptr)
+
+  arg_list <- ptrans_get_arg_list(ptr)
+
+  if(pname %in% arg_list){
+    stop(
+      paste0(pname,
+             " found in the parameter transform expression: ",
+             deparse(ptr),
+             "\n Please create a corresponding latent variable (e.g. ",
+             pname, "_latent).")
+    )
+  }
+
+  .dots <- list(...)
+
+  .dots_lengths <-
+    .dots |>
+    lapply(length) |>
+    unlist()
+
+  .dots <-
+    .dots |>
+    lapply(\(.x){
+      if(length(.x) == 1){
+        rep(.x, max(.dots_lengths))
+      }else{
+        .x
+      }
+    })
+
+  .dots_lengths <-
+    .dots |>
+    lapply(length) |>
+    unlist()
+
+  if(length(.dots) > 0){
+    stopifnot(all(.dots_lengths == max(.dots_lengths)))
+    p_nrow <- max(.dots_lengths)
+  }else{
+    p_nrow = 1
+  }
+
+  ptrans_df <- c(
+    list(pname = rep(arg_list, each = p_nrow)),
+    list(arg_num = rep(1:length(arg_list), each = p_nrow)),
+    lapply(.dots, rep, times = length(arg_list)),
+    list(stringsAsFactors = FALSE)) |>
+    do.call(data.frame, args = _)
+
+  arg_df <-
+    ptrans_df[["pname"]] |>
+    unique() |>
+    lapply(\(.pn){
+
+      .cn <- colnames(prm_df)
+      .cn <- .cn[.cn %in% c("pname", "pnum", colnames(ptrans_df))]
+
+      .prm_df <- prm_df |>
+        subset(pname == .pn, select = .cn) |>
+        lapply(\(.x) if(any(!is.na(.x))) list(.x) else NULL) |>
+        do.call(c, args = _) |>
+        as.data.frame()
+
+      .ptrans_df <-
+        ptrans_df |>
+        subset(pname == .pn)
+
+      merge(.prm_df, .ptrans_df, all.y = TRUE)
+    }) |>
+    Reduce(x = _,
+           f = \(.x, .y) merge(.x, .y, all = TRUE))
+
+  colnames(arg_df) <-
+    colnames(arg_df) |>
+    gsub("^pname$", "arg_name", x = _)
+
+  body <- ptrans_get_body(ptr)
+
+  fun_df <-
+    aggregate(arg_df[,c("arg_name", "pnum", "arg_num")],
+              arg_df[names(.dots)],
+              list) |>
+    within({
+      ptransform = mapply(
+        .arg_name = arg_name,
+        .pnum = pnum,
+        .arg_num = arg_num,
+        \(.arg_name, .pnum, .arg_num){
+          ptrans_fun(.arg_name[order(.arg_num)],
+                     body,
+                     .pnum[order(.arg_num)])
+        })
+      arg_name = NULL
+      pnum = NULL
+      arg_num = NULL
+    }) |>
+    within({
+      pname = pname
+    })
+
+  fun_df
 }
