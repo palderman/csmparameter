@@ -1,6 +1,13 @@
+#' Use the DEoptim package to perform global parameter optimization
+#'
 #' @export
 #'
-prm_run_optim <- function(prm_est, method='L-BFGS-B', control=list()){
+#' @param prm_est a named list created using [prm_create_prm_est]
+#'
+#' @param control a named list with options for \link[stats]{optim}() from the
+#'  \code{stats} package (See \link[stats]{optim} for details)
+#'
+prm_est_optim <- function(prm_est, method='L-BFGS-B', control=list()){
 
   if("pmin" %in% colnames(prm_est$prm_df)){
     lower <- prm_est$prm_df$pmin

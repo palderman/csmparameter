@@ -7,7 +7,7 @@
 #' @param control a named list created using \link[DEoptim]{DEoptim.control}() from the
 #'  DEoptim package (See \link[DEoptim]{DEoptim.control} for details)
 #'
-prm_run_DEoptim <- function(prm_est, control=DEoptim::DEoptim.control()){
+prm_est_DEoptim <- function(prm_est, control=DEoptim::DEoptim.control()){
 
   if(!requireNamespace("DEoptim")){
     stop("run_DEoptim_estimation() requires the DEoptim package. Please install it and try again.")
