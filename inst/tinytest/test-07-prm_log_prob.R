@@ -25,10 +25,10 @@ obs_df <-
     class = "data.frame",
     row.names = c(NA, -16L))
 
-sim_df <-
+yhat_df <-
   obs_df |>
-  csmparameter:::df_rename(sim = "obs") |>
-  aggregate(sim ~ EXPERIMENT + TRNO + DATE + variable,
+  csmparameter:::df_rename(yhat = "obs") |>
+  aggregate(yhat ~ EXPERIMENT + TRNO + DATE + variable,
             FUN = mean)
 
 pmu <- c(25, 32, 3.8)
@@ -56,12 +56,12 @@ prior_lp <- sum(
 
 log_likelihood <-
   obs_df |>
-  merge(sim_df, all = TRUE) |>
+  merge(yhat_df, all = TRUE) |>
   within({
     sd_tmp = sapply(variable, switch, "HWAM" = 250, "HIAM" = 0.025)
   }) |>
   with(
-    sum(dnorm(obs, mean = sim, sd = sd_tmp, log = TRUE))
+    sum(dnorm(obs, mean = yhat, sd = sd_tmp, log = TRUE))
   )
 
 expect_identical(
@@ -70,7 +70,7 @@ expect_identical(
   info = "prm_prior_log_density()")
 
 expect_identical(
-  csmparameter::prm_log_prob(obs_df, sim_df, prm_df, pval),
+  csmparameter::prm_log_prob(obs_df, yhat_df, prm_df, pval),
   prior_lp + log_likelihood,
   info = "prm_log_prob()")
 

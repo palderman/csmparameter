@@ -30,14 +30,14 @@ prm_get_model_outputs <- function(prm_est, pvals){
              error = function(e){NULL})
            # Read outputs
            if(!is.null(dssat_out)){
-             suppressMessages(prm_read_sim(.g))
+             suppressMessages(prm_read_yhat(.g))
            }else{
-             .g[["sim_template"]] |>
+             .g[["yhat_template"]] |>
                do.call(rbind, args = _) |>
                subset(select = c("EXPERIMENT", "TRNO")) |>
                unique() |>
                within({
-                 sim = NA_real_
+                 yhat = NA_real_
                })
            }
          }, SIMPLIFY = FALSE) |>

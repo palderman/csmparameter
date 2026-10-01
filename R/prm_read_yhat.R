@@ -1,16 +1,16 @@
 #' @export
 #'
-prm_read_sim <- function(run_df){
+prm_read_yhat <- function(run_df){
 
-  sim_template <-
-    run_df[["sim_template"]] |>
+  yhat_template <-
+    run_df[["yhat_template"]] |>
     Reduce(f = rbind,
            x = _)
 
-  if(nrow(sim_template) > 0){
+  if(nrow(yhat_template) > 0){
 
     run_expmt <-
-      sim_template |>
+      yhat_template |>
       subset(select = c("EXPERIMENT", "TRNO")) |>
       unique() |>
       within({
@@ -35,31 +35,31 @@ prm_read_sim <- function(run_df){
         out_df[["file_name"]] |>
         unique() |>
         lapply(\(.fn) read_model_output(.fn,
-                                        sim_template,
+                                        yhat_template,
                                         run_expmt,
                                         all_cols)) |>
         do.call(rbind, args = _) |>
-        merge(sim_template, all.x = TRUE) |>
+        merge(yhat_template, all.x = TRUE) |>
         within({
-          sim = ifelse(grepl("DAT$", variable),
-                       as.POSIXct(sim, tz='UTC', origin='1970-01-01') |>
+          yhat = ifelse(grepl("DAT$", variable),
+                       as.POSIXct(yhat, tz='UTC', origin='1970-01-01') |>
                          difftime(PDATE, units="days") |>
                          as.numeric(),
-                       sim)
+                       yhat)
         })
 
       }else{
 
-        out <- sim_template
+        out <- yhat_template
 
-        out[["sim"]] <- NA_real_
+        out[["yhat"]] <- NA_real_
 
       }
   }else{
 
-    out <- sim_template
+    out <- yhat_template
 
-    out[["sim"]] <- NA_real_
+    out[["yhat"]] <- NA_real_
 
   }
 
@@ -69,7 +69,7 @@ prm_read_sim <- function(run_df){
 
 }
 
-read_model_output <- function(file_name, sim_template, run_expmt, all_cols){
+read_model_output <- function(file_name, yhat_template, run_expmt, all_cols){
 
   raw_output <- read_output(file_name)
 
@@ -79,8 +79,8 @@ read_model_output <- function(file_name, sim_template, run_expmt, all_cols){
 
   merged_output <-
     raw_output |>
-    subset(TRNO %in% sim_template$TRNO &
-           DATE %in% sim_template$DATE) |>
+    subset(TRNO %in% yhat_template$TRNO &
+           DATE %in% yhat_template$DATE) |>
     df_rename(RUN = "RUNNO") |>
     select(-matches("(EXPERIMENT)|(MODEL)")) |>
     merge(run_expmt, all = TRUE)
@@ -103,7 +103,7 @@ read_model_output <- function(file_name, sim_template, run_expmt, all_cols){
   merged_output |>
     subset(select = select_cols) |>
     stack(select = stack_cols) |>
-    df_rename(sim = "values",
+    df_rename(yhat = "values",
               variable = "ind")
 
 }

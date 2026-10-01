@@ -42,10 +42,10 @@ prm_create_prm_est <- function(expmt_df, inp_df,
                              trno = .x$trno)),
        simplify = FALSE)
 
-  run_df[["sim_template"]] <-
+  run_df[["yhat_template"]] <-
     by(expmt_df, expmt_df$group,
        \(.df){
-           lapply(.df$sim_template,
+           lapply(.df$yhat_template,
                   FUN = unlist,
                   recursive = FALSE) |>
            lapply(\(.x) merge(.x$data_template,

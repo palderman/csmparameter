@@ -1,8 +1,8 @@
 #' @export
 #'
-prm_log_prob <- function(obs_df, sim_df, prm_df, pval){
+prm_log_prob <- function(obs_df, yhat_df, prm_df, pval){
 
-  if(prm_check_sim(sim_df)){
+  if(prm_check_yhat(yhat_df)){
 
     sigma_r_df <-
       prm_pval_df(pval, prm_df) |>
@@ -13,10 +13,10 @@ prm_log_prob <- function(obs_df, sim_df, prm_df, pval){
 
     log_likelihood <- obs_df |>
       # Combine observed and simulated data
-      merge(sim_df, all.x = TRUE) |>
+      merge(yhat_df, all.x = TRUE) |>
       merge(sigma_r_df, all.x = TRUE) |>
       # Calculate log-likelihood assuming errors normally distributed
-      with(dnorm(obs, mean = sim, sd = pval, log = TRUE)) |>
+      with(dnorm(obs, mean = yhat, sd = pval, log = TRUE)) |>
       sum()
 
     lp <- prior_lp + log_likelihood

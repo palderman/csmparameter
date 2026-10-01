@@ -209,12 +209,12 @@ pgro |>
   gstd_to_dt()
 
 pgro |>
-  rename(sim = GSTD) |> 
+  rename(yhat = GSTD) |> 
   full_join(filet) |> 
   rename(obs = GSTD) |> 
-  select(DATE, obs, sim) |> 
+  select(DATE, obs, yhat) |> 
   ggplot() +
-  geom_point(aes(x = sim, y = obs))+
+  geom_point(aes(x = yhat, y = obs))+
   geom_abline(intercept = 0, slope = 1)+
   xlim(c(0, 60))+
   ylim(c(0, 60))+
@@ -269,7 +269,7 @@ expmt_tbl <-
 
 ### Define objective function
 
-* In the following code, we define an objective function for the sum of the relative sum of squared error (`rSSE`), that is the sum of squared error divided by the average of observations for each variable. The simulated values (`sim_tbl`) are first checked for missing values using the `check_sim_data()` function from the `csmparameter` package. If simulated values fail to pass the check, the maximum representable floating point value (`.Machine$double.xmax`) is returned instead.
+* In the following code, we define an objective function for the sum of the relative sum of squared error (`rSSE`), that is the sum of squared error divided by the average of observations for each variable. The simulated values (`yhat_df`) are first checked for missing values using the `check_yhat_data()` function from the `csmparameter` package. If simulated values fail to pass the check, the maximum representable floating point value (`.Machine$double.xmax`) is returned instead.
 
 ```{r echo=TRUE, message=FALSE}
 csmparameter::rSSE_fun
@@ -323,12 +323,12 @@ pgr2 <- read_output("plantgr2.csv")
 
 pgr2 |>
   select(-GSTD) |> 
-  rename(sim = RSTD) |> 
+  rename(yhat = RSTD) |> 
   full_join(filet) |> 
   rename(obs = RSTD) |> 
-  select(DATE, obs, sim) |> 
+  select(DATE, obs, yhat) |> 
   ggplot() +
-  geom_point(aes(x = sim, y = obs))+
+  geom_point(aes(x = yhat, y = obs))+
   geom_abline(intercept = 0, slope = 1)+
   xlim(c(0, 5))+
   ylim(c(0, 5))+

@@ -84,7 +84,7 @@ prm_create_expmt <- function(expmt, data){
     subset(!is.na(obs) & variable %in% data_types,
            select = c("EXPERIMENT", "TRNO", "DATE", everything()))
 
-  sim_data_template <- joined_data |>
+  yhat_data_template <- joined_data |>
     subset(select = c("EXPERIMENT", "TRNO", "DATE", "variable"))
 
   if(!exists('pdate', envir = environment(fun = NULL))){
@@ -94,7 +94,7 @@ prm_create_expmt <- function(expmt, data){
       })
   }
 
-  sim_template <- data.frame(data_template = I(list(sim_data_template)),
+  yhat_template <- data.frame(data_template = I(list(yhat_data_template)),
                              pdate = I(list(pdate)))
 
   if(!exists('filex', envir = environment(fun = NULL))){
@@ -106,8 +106,8 @@ prm_create_expmt <- function(expmt, data){
                       obs_df = I(list(joined_data)),
                       trno = I(list(trno)),
                       data_types = I(list(data_types)),
-                      sim_template = I(list(sim_template))) |>
-    add_output_df() |>
+                      yhat_template = I(list(yhat_template))) |>
+    prm_add_out_df() |>
     as_prm_expmt_df()
 
   return(expmt)

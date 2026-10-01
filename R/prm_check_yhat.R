@@ -1,10 +1,10 @@
 #' @export
 #'
-prm_check_sim <- function(obs_sim){
+prm_check_yhat <- function(obs_yhat){
 
-  if(any(is.na(obs_sim$sim))){
-    warn_out <- obs_sim |>
-      filter(is.na(sim)) |>
+  if(any(is.na(obs_yhat$yhat))){
+    warn_out <- obs_yhat |>
+      filter(is.na(yhat)) |>
       (\(.x) capture.output(print(.x)))() |>
       (\(.x) c(
         paste0("Missing values were present in simulated output.",
