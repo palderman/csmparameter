@@ -1,6 +1,6 @@
 #' @export
 #'
-prm_log_prob <- function(obs_df, yhat_df, prm_df, pval){
+prm_obj_log_prob <- function(obs_df, yhat_df, prm_df, pval){
 
   if(prm_check_yhat(yhat_df)){
 

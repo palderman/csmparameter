@@ -1,6 +1,6 @@
 #' @export
 #'
-prm_SSE <- function(obs_df, yhat_df, ...){
+prm_obj_SSE <- function(obs_df, yhat_df, ...){
 
   if(prm_check_yhat(yhat_df)){
     SSE <- obs_df |>
