@@ -10,7 +10,7 @@
 #'   parameter estimation or a character vector of names for DSSAT-formatted
 #'   files for seasonal (File A) or within-season (File T) data
 #'
-prm_create_expmt <- function(expmt, data){
+prm_filex_to_sim <- function(expmt, data){
 
   if(is.null(trno)){
     filex <- DSSAT::read_filex(expmt)
