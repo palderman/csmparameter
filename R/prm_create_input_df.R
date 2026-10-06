@@ -1,7 +1,7 @@
 #'
 #' @export
 #'
-prm_create_inp_df <- function(prm_df, search_path = ".", ...){
+prm_create_input_df <- function(prm_df, search_path = ".", ...){
 
   file_list <- prm_df$pfile |>
     unique()
