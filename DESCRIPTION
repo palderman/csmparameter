@@ -20,6 +20,7 @@ Suggests:
     tinytest,
     DEoptim,
     knitr,
-    rmarkdown
+    rmarkdown,
+    sensitivity
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0
