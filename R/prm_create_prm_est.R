@@ -5,8 +5,15 @@
 #' @param sim_df a data frame of simulation definitions as created by
 #'   \link{prm_create_sim_df}
 #'
+#' @param prm_df a data frame of parameter definitions as created by
+#'   \link{prm_create_prm_df}
 #'
-#' @param prm_df a data frame
+#' @param obj_fun a function defining the objective function that should be
+#'  minimized during the parameter estimation as defined by
+#'  \link{prm_create_obj_fun}. This function should accept as arguments at
+#'  minimum two data frames: one for observations (\code{obs_df} and one for
+#'  output of simulations (\code{yhat_df}). The function should return a scalar
+#'  value.
 #'
 #'  @param call_model a function that calls
 #'
