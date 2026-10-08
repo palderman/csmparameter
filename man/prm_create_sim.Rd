@@ -4,20 +4,11 @@
 \alias{prm_create_sim}
 \title{Create a simulation for parameter estimation}
 \usage{
-prm_create_sim(sim_args, data_df, time_alias, ...)
+prm_create_sim(sim_args, ...)
 }
 \arguments{
 \item{sim_args}{a list of arguments to be used when running the simulation
 with the model function}
-
-\item{data_df}{a data frame of seasonal summary and within-season data to use
-for parameter estimation. The data should be formatted in long format with
-columns for time (named \code{time}), variable name (named \code{variable})
-and observed data (named \code{obs}). Seasonal summary data should have NA
-for the time column.}
-
-\item{time_alias}{an optional additional argument providing a new name to use
-for the time variable. This name should match what the model returns.}
 
 \item{...}{optional additional arguments providing grouping factors for
 identifying the simulation}
