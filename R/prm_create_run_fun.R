@@ -14,7 +14,9 @@
 prm_create_run_fun <- function(fun_name,
                                prm_name = "prm",
                                time_name = "time"){
-c("function(prm_vec, prm_est){",
+c("function(prm_in, prm_est){",
+  "  prm_vec <- prm_apply_transform(prm_est[[\"prm_df\"]], pval = prm_in) |> ",
+  "    setNames(nm = prm_est[[\"prm_df\"]][[\"pname\"]])",
   "  out_list <- ",
   "    prm_est[[\"sim_df\"]][[\"sim_args\"]] |> ",
   paste0("      lapply(\\(.a) c(list(", prm_name, " = prm_vec), .a)) |> "),

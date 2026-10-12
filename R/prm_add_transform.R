@@ -99,7 +99,7 @@ prm_add_transform <- function(prm_df, ptrans, ...){
   fun_df <- lapply(as.list(ptrans), create_transform_function,
                    prm_df = prm_df, ...) |>
     Reduce(x = _,
-           f = \(.x, .y) merge(.x, .y, all = TRUE))
+           f = \(.x, .y) merge(.x, .y, all = TRUE, sort = FALSE))
 
   if(! "ptransform" %in% colnames(prm_df)){
     prm_df$ptransform <- vector(mode = "list", length = nrow(prm_df))
@@ -197,63 +197,73 @@ create_transform_function <- function(ptr, prm_df, ...){
     p_nrow = 1
   }
 
-  ptrans_df <- c(
-    list(pname = rep(arg_list, each = p_nrow)),
-    list(arg_num = rep(1:length(arg_list), each = p_nrow)),
-    lapply(.dots, rep, times = length(arg_list)),
-    list(stringsAsFactors = FALSE)) |>
-    do.call(data.frame, args = _)
+  fun_body <- ptrans_get_body(ptr)
 
-  arg_df <-
-    ptrans_df[["pname"]] |>
-    unique() |>
-    lapply(\(.pn){
+  if(length(arg_list) > 0){
 
-      .cn <- colnames(prm_df)
-      .cn <- .cn[.cn %in% c("pname", "pnum", colnames(ptrans_df))]
+    ptrans_df <- c(
+      list(pname = rep(arg_list, each = p_nrow)),
+      list(arg_num = rep(1:length(arg_list), each = p_nrow)),
+      lapply(.dots, rep, times = length(arg_list)),
+      list(stringsAsFactors = FALSE)) |>
+      do.call(data.frame, args = _)
 
-      .prm_df <- prm_df |>
-        subset(pname == .pn, select = .cn) |>
-        lapply(\(.x) if(any(!is.na(.x))) list(.x) else NULL) |>
-        do.call(c, args = _) |>
-        as.data.frame()
+    arg_df <-
+      ptrans_df[["pname"]] |>
+      unique() |>
+      lapply(\(.pn){
 
-      .ptrans_df <-
-        ptrans_df |>
-        subset(pname == .pn)
+        .cn <- colnames(prm_df)
+        .cn <- .cn[.cn %in% c("pname", "pnum", colnames(ptrans_df))]
 
-      merge(.prm_df, .ptrans_df, all.y = TRUE)
-    }) |>
-    Reduce(x = _,
-           f = \(.x, .y) merge(.x, .y, all = TRUE))
+        .prm_df <- prm_df |>
+          subset(pname == .pn, select = .cn) |>
+          lapply(\(.x) if(any(!is.na(.x))) list(.x) else NULL) |>
+          do.call(c, args = _) |>
+          as.data.frame()
 
-  colnames(arg_df) <-
-    colnames(arg_df) |>
-    gsub("^pname$", "arg_name", x = _)
+        .ptrans_df <-
+          ptrans_df |>
+          subset(pname == .pn)
 
-  body <- ptrans_get_body(ptr)
+        merge(.prm_df, .ptrans_df, all.y = TRUE)
+      }) |>
+      Reduce(x = _,
+             f = \(.x, .y) merge(.x, .y, all = TRUE))
 
-  fun_df <-
-    aggregate(arg_df[,c("arg_name", "pnum", "arg_num")],
-              arg_df[names(.dots)],
-              list) |>
-    within({
-      ptransform = mapply(
-        .arg_name = arg_name,
-        .pnum = pnum,
-        .arg_num = arg_num,
-        \(.arg_name, .pnum, .arg_num){
-          ptrans_fun(.arg_name[order(.arg_num)],
-                     body,
-                     .pnum[order(.arg_num)])
-        })
-      arg_name = NULL
-      pnum = NULL
-      arg_num = NULL
-    }) |>
-    within({
-      pname = pname
-    })
+    colnames(arg_df) <-
+      colnames(arg_df) |>
+      gsub("^pname$", "arg_name", x = _)
+
+    fun_df <-
+      aggregate(arg_df[,c("arg_name", "pnum", "arg_num")],
+                arg_df[names(.dots)],
+                list) |>
+      within({
+        ptransform = mapply(
+          .arg_name = arg_name,
+          .pnum = pnum,
+          .arg_num = arg_num,
+          \(.arg_name, .pnum, .arg_num){
+            ptrans_fun(.arg_name[order(.arg_num)],
+                       fun_body,
+                       .pnum[order(.arg_num)])
+          })
+        arg_name = NULL
+        pnum = NULL
+        arg_num = NULL
+      }) |>
+      within({
+        pname = pname
+      })
+
+  }else{
+
+    fun_df <- data.frame(
+      pname = pname,
+      ptransform = I(list(ptrans_fun(arg_list, fun_body, numeric())))
+    )
+  }
 
   fun_df
 }

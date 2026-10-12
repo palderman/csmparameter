@@ -6,9 +6,10 @@
 #'  function in which the observed data are named \code{obs} and the
 #'  corresponding simulated output data are named \code{yhat}
 #'
-#' @param aggr an expression or formula object for aggregating objective
-#'  function values into a single scalar result in which objective function
-#'  values are named \code{obj_val}
+#' @param aggr an expression or formula object for aggregating group-specific
+#'  objective function values for groups indicated in the \code{by} argument
+#'  into a single scalar result. The expression should use the name
+#'  \code{obj_val} for the group-specific objective function values
 #'
 #' @param by an optional formula providing a set of grouping factors by which to
 #'  group the initial calculation of the objective function value. For more
@@ -25,10 +26,17 @@ prm_create_obj_fun <- function(obj, aggr, by){
   }
 
   if(missing(by)){
-    obj_calc <- c(
-      "      within({",
-      paste0("        obj_val = ", obj_char),
-      "      }) |>")
+    if(missing(aggr)){
+      obj_calc <- c(
+        "      with({",
+        paste0("        ", obj_char),
+        "      })")
+    }else{
+      obj_calc <- c(
+        "      within({",
+        paste0("        obj_val = ", obj_char),
+        "      })")
+    }
   }else{
     obj_calc <- by |>
       as.character() |>
@@ -37,17 +45,22 @@ prm_create_obj_fun <- function(obj, aggr, by){
       c(paste0("      by(FUN = \\(.x) with(.x, ", obj_char, "), "),
         x = _,
         "         simplify = FALSE) |>",
-        "      array2DF(responseName = 'obj_val') |> ")
+        "      array2DF(responseName = 'obj_val')")
   }
 
-  aggr_char <- aggr |>
-    as.character()
+  if(!missing(aggr)){
 
-  if("formula" %in% class(aggr)){
-    aggr_char <- aggr_char[-1]
+    aggr_char <- aggr |>
+      as.character()
+
+    if("formula" %in% class(aggr)){
+      aggr_char <- aggr_char[-1]
+    }
+
+    aggr_calc <- paste0("    with(", aggr_char, ")")
+  }else{
+    aggr_calc <- NULL
   }
-
-  aggr_calc <- paste0("    with(", aggr_char, ")")
 
   c("function (obs_df, yhat_df, ...) ",
     "{",
@@ -55,7 +68,7 @@ prm_create_obj_fun <- function(obj, aggr, by){
     "    obj_val <- obs_df |>",
     "      merge(yhat_df, all = TRUE) |>",
     obj_calc,
-    "      subset(!is.na(obj_val)) |>",
+    # "      subset(!is.na(obj_val)) |>",
     aggr_calc,
     "  }else{",
     "    obj_val <- .Machine$double.xmax",

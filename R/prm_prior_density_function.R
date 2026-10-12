@@ -11,8 +11,7 @@ check_pdist <- function(pdist, pdist_options = c("normal", "uniform")){
 }
 
 # Function for creating local constants for prior density function
-value_to_code <- function(name, val) paste0(name, " <- ",
-                                        deparse(val, control = c("all", "hexNumeric")))
+value_to_code <- function(name, val) paste0(name, " <- ", sprintf("%a", val))
 
 tnorm_dens_adj <- function(pmin, pmax, pmu, psigma){
     log(pnorm(pmax, mean = pmu, sd = psigma) - pnorm(pmin, mean = pmu, sd = psigma))

@@ -14,16 +14,16 @@ prm_est_DEoptim <- function(prm_est, control=DEoptim::DEoptim.control()){
   }
 
   if("pmin" %in% colnames(prm_est$prm_df)){
-    lower <- prm_est$prm_df$pmin
+    lower <- prm_est[["prm_df"]][["pmin"]]
   }else{
-    lower <- prm_get_pmin(prm_est$prm_df$pdensity)
+    lower <- prm_get_pmin(prm_est[["prm_df"]][["pdensity"]])
   }
   lower <- lower[!is.na(lower)]
 
   if("pmax" %in% colnames(prm_est$prm_df)){
-    upper <- prm_est$prm_df$pmax
+    upper <- prm_est[["prm_df"]][["pmax"]]
   }else{
-    upper <- prm_get_pmax(prm_est$prm_df$pdensity)
+    upper <- prm_get_pmax(prm_est[["prm_df"]][["pdensity"]])
   }
   upper <- upper[!is.na(upper)]
 
@@ -33,7 +33,7 @@ prm_est_DEoptim <- function(prm_est, control=DEoptim::DEoptim.control()){
     }else{
       NP <- control$NP
     }
-    control$initialpop <- prm_sample_prior(prm_est$prm_df, n = NP)
+    control$initialpop <- prm_sample_prior(prm_est[["prm_df"]], n = NP)
   }
 
   est_out <- DEoptim::DEoptim(fn = prm_eval_obj_fun,

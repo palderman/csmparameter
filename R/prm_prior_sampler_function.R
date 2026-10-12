@@ -4,18 +4,18 @@ uniform_prior_sampler <- function(pmin, pmax){
   if(is.na(pmax) || is.null(pmax)) pmax <- .Machine$double.xmax
 
   prior_sampler_fun <- c(
-    "function(n){",
+    "function(n, p = runif(n)){",
     # define local constants
     # value_to_code() function defined in prm_prior_density.R
     value_to_code("pmin", pmin),
     value_to_code("pmax", pmax),
     #
-    "pval <- exp(log(pnorm(rnorm(n)))+log(pmax - pmin))+pmin",
+    "pval <- exp(log(p)+log(pmax - pmin))+pmin",
     "return(pval)",
     "}") |>
     (\(.x) parse(text =.x)
      )() |>
-    eval()
+    eval(envir = .GlobalEnv)
 
   return(prior_sampler_fun)
 
@@ -27,7 +27,7 @@ normal_prior_sampler <- function(pmin, pmax, pmu, psigma){
   if(is.na(pmax) || is.null(pmax)) pmax <- Inf
 
   prior_sampler_fun <- c(
-    "function(n){",
+    "function(n, p = pnorm(rnorm(n))){",
     # define local constants
     value_to_code("pmin", pmin),
     value_to_code("pmax", pmax),
@@ -36,13 +36,13 @@ normal_prior_sampler <- function(pmin, pmax, pmu, psigma){
     #
     "prob_min <- pnorm(pmin, mean = pmu, sd = psigma)",
     "prob_max <- pnorm(pmax, mean = pmu, sd = psigma)",
-    "prob_pval <- exp(log(pnorm(rnorm(n)))+log(prob_max - prob_min)) + prob_min",
+    "prob_pval <- exp(log(p)+log(prob_max - prob_min)) + prob_min",
     "pval <- qnorm(prob_pval, mean = pmu, sd = psigma)",
     "return(pval)",
     "}") |>
     (\(.x) parse(text =.x)
      )() |>
-    eval()
+    eval(envir = .GlobalEnv)
 
   return(prior_sampler_fun)
 
