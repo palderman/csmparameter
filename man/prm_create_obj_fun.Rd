@@ -11,9 +11,10 @@ prm_create_obj_fun(obj, aggr, by)
 function in which the observed data are named \code{obs} and the
 corresponding simulated output data are named \code{yhat}}
 
-\item{aggr}{an expression or formula object for aggregating objective
-function values into a single scalar result in which objective function
-values are named \code{obj_val}}
+\item{aggr}{an expression or formula object for aggregating group-specific
+objective function values for groups indicated in the \code{by} argument
+into a single scalar result. The expression should use the name
+\code{obj_val} for the group-specific objective function values}
 
 \item{by}{an optional formula providing a set of grouping factors by which to
 group the initial calculation of the objective function value. For more
