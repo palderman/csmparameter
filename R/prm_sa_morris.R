@@ -24,30 +24,6 @@ prm_sa_morris <- function(prm_sa, ...){
 
   true_prm_df <- prm_sa[["prm_df"]][true_prms,]
 
-  if("pmin" %in% colnames(true_prm_df)){
-    lower <- true_prm_df$pmin
-  }else{
-    lower <- prm_get_pmin(true_prm_df$pdensity)
-  }
-  for(i in seq_along(true_prm_df[["psampler"]])){
-    if(is.na(lower[i])){
-      lower[i] <- true_prm_df[["psampler"]][[i]](n = 1, p = 0.01)
-    }
-  }
-  stopifnot(!is.na(lower))
-
-  if("pmax" %in% colnames(true_prm_df)){
-    upper <- true_prm_df$pmax
-  }else{
-    upper <- prm_get_pmax(true_prm_df$pdensity)
-  }
-  for(i in seq_along(true_prm_df[["psampler"]])){
-    if(is.na(upper[i])){
-      upper[i] <- true_prm_df[["psampler"]][[i]](n = 1, p = 0.99)
-    }
-  }
-  stopifnot(!is.na(upper))
-
   morris_args <- list(...)
 
   if(!"factors" %in% names(morris_args)){
