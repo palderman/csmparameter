@@ -1,30 +1,27 @@
-#' Create a parameter estimation object
+#' Create a parameter sensitivity analysis object
 #'
 #' @export
 #'
-#' @param expmt_df a data frame of experiment definitions as created by
-#'   \link{prm_create_expmt_df}
+#' @inheritParams prm_create_prm_est sim_df prm_df obs_df run_fun smry_fun
 #'
-#' @param input_df a data frame of input definitions as created by
-#'   \link{prm_create_input_df}
-#'
-#' @param prm_df a data frame
-#'
-prm_create_prm_sa <- function(expmt_df, inp_df,
-                               prm_df, sa_fun,
-                               model_type = "DSSAT-CSM",
-                               model_call){
+prm_create_prm_sa <- function(sim_df, prm_df, obs_df,
+                              run_fun, smry_fun){
+
+  obs_df <-
+    obs_df |>
+    subset(select = -obs) |>
+    unique() |>
+    within({obs = NA_real_})
 
   prm_sa <-
-    prm_create_prm_est(expmt_df = expmt_df,
-                       inp_df = inp_df,
+    prm_create_prm_est(sim_df = sim_df,
                        prm_df = prm_df,
-                       obj_fun = sa_fun,
-                       model_type = model_type,
-                       model_call = model_call)
+                       obs_df = obs_df,
+                       run_fun = run_fun,
+                       smry_fun = smry_fun,
+                       obj_fun = function(){NULL})
 
-  prm_sa[["sa_fun"]] <- prm_sa[["obj_fun"]]
+  prm_sa[["obj_fun"]] <- NULL
 
-  prm_sa$obj_fun <- NULL
-
+  prm_sa
 }

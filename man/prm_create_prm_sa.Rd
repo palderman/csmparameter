@@ -2,26 +2,29 @@
 % Please edit documentation in R/prm_create_prm_sa.R
 \name{prm_create_prm_sa}
 \alias{prm_create_prm_sa}
-\title{Create a parameter estimation object}
+\title{Create a parameter sensitivity analysis object}
 \usage{
-prm_create_prm_sa(
-  expmt_df,
-  inp_df,
-  prm_df,
-  sa_fun,
-  model_type = "DSSAT-CSM",
-  model_call
-)
+prm_create_prm_sa(sim_df, prm_df, obs_df, run_fun, smry_fun)
 }
 \arguments{
-\item{expmt_df}{a data frame of experiment definitions as created by
-\link{prm_create_expmt_df}}
+\item{sim_df}{a data frame of simulation definitions as created by
+\link{prm_create_sim_df}}
 
-\item{prm_df}{a data frame}
+\item{prm_df}{a data frame of parameter definitions as created by
+\link{prm_create_prm_df}}
 
-\item{input_df}{a data frame of input definitions as created by
-\link{prm_create_input_df}}
+\item{obs_df}{a data frame of observed data as created by
+\link{prm_create_obs_df}}
+
+\item{run_fun}{a function that takes a parameter vector as its first
+argument and a prm_est object as its second argument that calls the model
+and returns model output in the form of a data frame corresponding to
+\code{obs_df} with model simulated values in column \code{yhat}}
+
+\item{smry_fun}{an optional function as created by
+\link{prm_create_smry_fun} that computes summary variables based on direct
+model outputs}
 }
 \description{
-Create a parameter estimation object
+Create a parameter sensitivity analysis object
 }

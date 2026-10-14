@@ -9,14 +9,18 @@
 #'
 prm_sa_morris <- function(prm_sa, ...){
 
-  if(!requireNamespace("sensitivity")){
-    stop("prm_run_morris() requires the sensitivity package. Please install it and try again.")
+  if(!suppressMessages(requireNamespace("sensitivity", quietly = TRUE))){
+    stop("prm_sa_morris() requires the sensitivity package. Please install it and try again.")
   }
 
-  true_prms <-
-    prm_sa[["prm_df"]][["ptransform"]] |>
-    lapply(is.null) |>
-    unlist()
+  if(is.null(prm_sa[["prm_df"]][["ptransform"]])){
+    true_prms <- rep(TRUE, nrow = prm_sa[["prm_df"]])
+  }else{
+    true_prms <-
+      prm_sa[["prm_df"]][["ptransform"]] |>
+      lapply(is.null) |>
+      unlist()
+  }
 
   true_prm_df <- prm_sa[["prm_df"]][true_prms,]
 
@@ -25,18 +29,29 @@ prm_sa_morris <- function(prm_sa, ...){
   }else{
     lower <- prm_get_pmin(true_prm_df$pdensity)
   }
-  lower <- lower[!is.na(lower)]
+  for(i in seq_along(true_prm_df[["psampler"]])){
+    if(is.na(lower[i])){
+      lower[i] <- true_prm_df[["psampler"]][[i]](n = 1, p = 0.01)
+    }
+  }
+  stopifnot(!is.na(lower))
 
   if("pmax" %in% colnames(true_prm_df)){
     upper <- true_prm_df$pmax
   }else{
     upper <- prm_get_pmax(true_prm_df$pdensity)
   }
-  upper <- upper[!is.na(upper)]
+  for(i in seq_along(true_prm_df[["psampler"]])){
+    if(is.na(upper[i])){
+      upper[i] <- true_prm_df[["psampler"]][[i]](n = 1, p = 0.99)
+    }
+  }
+  stopifnot(!is.na(upper))
 
   morris_args <- list(...)
 
   morris_args[["binf"]] <- lower
+
   morris_args[["bsup"]] <- upper
 
   if(!"factors" %in% names(morris_args)){
@@ -53,63 +68,59 @@ prm_sa_morris <- function(prm_sa, ...){
 
   morris_design <- do.call(sensitivity::morris, args = morris_args)
 
-  sim_mat <-
-    morris_design$X |>
-    apply(1, prm_sa[["sa_fun"]])
+  n_prm <- sum(true_prms)
 
-  return()
+  morris_df <- list()
 
-  # morris_design$X |>
-
-
-  if(is.null(control$initialpop)){
-    if(is.null(control$NP) | is.na(control$NP) | control$NP < 4){
-      NP <- 10*length(lower)
-    }else{
-      NP <- control$NP
-    }
-    control$initialpop <- prm_sample_prior(prm_sa$prm_df, n = NP)
+  for(.c in names(prm_sa[["yhat_template"]])){
+    morris_df[[.c]] <- prm_sa[["yhat_template"]][[.c]] |>
+      rep(each = n_prm)
   }
 
-  return(est_out)
+  morris_stats <-
+    morris_design$X |>
+    apply(1,
+          prm_sa[["run_fun"]],
+          prm_est = prm_sa, simplify = FALSE) |>
+    lapply(\(.x) with(.x, yhat)) |>
+    do.call(rbind, args = _) |>
+    as.matrix() |>
+    apply(2,
+          \(.y) sensitivity::tell(morris_design, y = .y),
+          simplify =  FALSE) |>
+    lapply(compute_morris_statistics) |>
+    do.call(rbind, args = _) |>
+    as.data.frame()
 
+  morris_df <-
+    morris_df |>
+    as.data.frame() |>
+    cbind(morris_stats) |>
+    as.data.frame()
+
+  rownames(morris_df) <- NULL
+
+  morris_df
 }
 
 
-compute_morris_statistics <- function(.morris, v_names){
+compute_morris_statistics <- function(.morris){
 
-  mu <- apply(.morris$ee, 3, \(M){
-    apply(M, 2, mean)
-  })
+  mu <- apply(.morris$ee, 2, mean)
 
-  mu_star <- apply(abs(.morris$ee), 3, \(M){
-    apply(M, 2, mean)
-  })
+  mu_star <- .morris$ee |>
+    abs() |>
+    apply(2, mean)
 
-  sigma <- apply(.morris$ee, 3, \(M){
-    apply(M, 2, sd)
-  })
-
-  if(missing(v_names)) v_names <- paste0("v", 1:ncol(mu))
-
-    morris_stats <-
-    list(mu = mu, mu_star = mu_star, sigma = sigma) |>
-    lapply(\(.x) data.frame(variable = rep(v_names, each = nrow(.x)),
-                            prm = rep(rownames(.x), length(v_names)),
-                            value = as.vector(.x)))
-
-  for(i in seq_along(morris_stats)){
-    morris_stats[[i]][["stat"]] <- names(morris_stats)[i]
-  }
+  sigma <- apply(.morris$ee, 2, sd)
 
   stats_df <-
-    do.call(rbind, args = morris_stats) |>
-    reshape(timevar = "stat",
-            idvar = c("variable","prm"),
-            direction = "wide")
+    data.frame(prm = colnames(.morris$ee),
+               mu = mu,
+               mu_star = mu_star,
+               sigma = sigma)
+
   rownames(stats_df) <- NULL
-  colnames(stats_df) <- colnames(stats_df) |>
-    gsub("^value\\.", "", x = _)
 
   stats_df
 }

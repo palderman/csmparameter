@@ -21,16 +21,16 @@ argument and a prm_est object as its second argument that calls the model
 and returns model output in the form of a data frame corresponding to
 \code{obs_df} with model simulated values in column \code{yhat}}
 
+\item{smry_fun}{an optional function as created by
+\link{prm_create_smry_fun} that computes summary variables based on direct
+model outputs}
+
 \item{obj_fun}{a function defining the objective function that should be
 minimized during the parameter estimation as defined by
 \link{prm_create_obj_fun}. This function should accept as arguments at
 minimum two data frames: one for observations (\code{obs_df} and one for
 output of simulations (\code{yhat_df}). The function should return a scalar
-value.
-
-@param smry_fun an optional function as created by
-\link{prm_create_smry_fun} that computes summary variables based on direct
-model outputs}
+value.}
 }
 \description{
 Create a parameter estimation object

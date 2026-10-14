@@ -18,7 +18,7 @@
 #'  output of simulations (\code{yhat_df}). The function should return a scalar
 #'  value.
 #'
-#'  @param smry_fun an optional function as created by
+#' @param smry_fun an optional function as created by
 #'   \link{prm_create_smry_fun} that computes summary variables based on direct
 #'   model outputs
 #'
