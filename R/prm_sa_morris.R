@@ -50,10 +50,6 @@ prm_sa_morris <- function(prm_sa, ...){
 
   morris_args <- list(...)
 
-  morris_args[["binf"]] <- lower
-
-  morris_args[["bsup"]] <- upper
-
   if(!"factors" %in% names(morris_args)){
     morris_args[["factors"]] <- true_prm_df[,"pname"]
   }
@@ -77,20 +73,9 @@ prm_sa_morris <- function(prm_sa, ...){
       rep(each = n_prm)
   }
 
-  morris_stats <-
-    morris_design$X |>
-    apply(1,
-          prm_sa[["run_fun"]],
-          prm_est = prm_sa, simplify = FALSE) |>
-    lapply(\(.x) with(.x, yhat)) |>
-    do.call(rbind, args = _) |>
-    as.matrix() |>
-    apply(2,
-          \(.y) sensitivity::tell(morris_design, y = .y),
-          simplify =  FALSE) |>
-    lapply(compute_morris_statistics) |>
-    do.call(rbind, args = _) |>
-    as.data.frame()
+  morris_stats <- run_design(morris_design,
+                             compute_morris_statistics,
+                             prm_sa)
 
   morris_df <-
     morris_df |>
@@ -102,6 +87,26 @@ prm_sa_morris <- function(prm_sa, ...){
 
   morris_df
 }
+
+run_design <- function(design, stat_fun, prm_sa){
+    prm_sample_prior(prm_df,
+                     n = ncol(design$X),
+                     p = design$X) |>
+    apply(1,
+          prm_sa[["run_fun"]],
+          prm_est = prm_sa,
+          simplify = FALSE) |>
+    lapply(\(.x) with(.x, yhat)) |>
+    do.call(rbind, args = _) |>
+    as.matrix() |>
+    apply(2,
+          \(.y) sensitivity::tell(design, y = .y),
+          simplify =  FALSE) |>
+    lapply(stat_fun) |>
+    do.call(rbind, args = _) |>
+    as.data.frame()
+}
+
 
 
 compute_morris_statistics <- function(.morris){
