@@ -1,26 +1,23 @@
 Package: csmparameter
 Type: Package
-Title: Parameter sensitivity analysis and estimation for the DSSAT-CSM
+Title: Parameter sensitivity analysis and estimation for crop simulation models
 Version: 0.0.0.9000
 Author: Phillip D. Alderman [aut, cre]
 Maintainer: Phillip D. Alderman <phillip.alderman@okstate.edu>
 Description: The purpose of this package is to provide parameter
-  sensitivity analysis and estimation capability for the Decision
-  Support System for Agrotechnology Transfer Cropping Systems Model
-  (DSSAT-CSM).
+  sensitivity analysis and estimation capability for crop simulation models
 License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 4.1.0)
-Imports: 
-    DSSAT
 Roxygen: list(markdown = TRUE)
 Suggests: 
     tinytest,
     DEoptim,
     knitr,
     rmarkdown,
-    sensitivity
+    sensitivity,
+    DSSAT
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0
