@@ -9,8 +9,8 @@
 #'
 prm_est_DEoptim <- function(prm_est, control=DEoptim::DEoptim.control()){
 
-  if(!requireNamespace("DEoptim")){
-    stop("run_DEoptim_estimation() requires the DEoptim package. Please install it and try again.")
+  if(!suppressMessages(requireNamespace("DEoptim", quietly = TRUE))){
+    stop("prm_est_DEoptim() requires the DEoptim package. Please install it and try again.")
   }
 
   if("pmin" %in% colnames(prm_est$prm_df)){
