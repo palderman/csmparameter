@@ -116,7 +116,7 @@ prm_add_transform <- function(prm_df, ptrans, ...){
       pdensity = rep(list(NULL), length(pname))
       psampler = rep(list(NULL), length(pname))
     }) |>
-    merge(fun_df)
+    merge(fun_df, sort = FALSE)
 
   # Add any transformed parameters to prm_df that are not
   #  already present
@@ -226,10 +226,10 @@ create_transform_function <- function(ptr, prm_df, ...){
           ptrans_df |>
           subset(pname == .pn)
 
-        merge(.prm_df, .ptrans_df, all.y = TRUE)
+        merge(.prm_df, .ptrans_df, all.y = TRUE, sort = FALSE)
       }) |>
       Reduce(x = _,
-             f = \(.x, .y) merge(.x, .y, all = TRUE))
+             f = \(.x, .y) merge(.x, .y, all = TRUE, sort = FALSE))
 
     colnames(arg_df) <-
       colnames(arg_df) |>
