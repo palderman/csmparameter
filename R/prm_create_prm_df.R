@@ -22,7 +22,7 @@ prm_create_prm_df <- function(pname,
   if(any(is.null(pname) | is.na(pname))) warning("pname cannot be NULL or missing")
   pdist <- match.arg(pdist)
 
-  prm <- data.frame(pname = pname, pd_args = I(pd_args), pdist = pdist, pfmt = pfmt, ...) |>
+  prm <- data.frame(pname = pname, pd_args = I(pd_args), pdist = pdist, ...) |>
     within({
       pdensity = mapply(\(.dist, .args){
         do.call(prm_prior_density_function,
