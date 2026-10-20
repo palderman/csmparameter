@@ -6,12 +6,8 @@
 \usage{
 prm_create_prm_df(
   pname,
-  pmin = -Inf,
-  pmax = Inf,
-  pmu = NA_real_,
-  psigma = NA_real_,
-  pdist = "uniform",
-  pfmt = NA_character_,
+  pdist = c("uniform", "normal", "student_t", "gamma", "inv_gamma", "beta"),
+  pd_args = list(pmin = -Inf, pmax = Inf),
   ...
 )
 }
@@ -19,20 +15,11 @@ prm_create_prm_df(
 \item{pname}{a character vector providing the name(s) of parameter(s) to be
 estimated}
 
-\item{pmin}{a numeric vector providing the lower bound(s) for parameter(s) to
-be estimated. The default is -Inf (i.e. unbounded).}
-
-\item{pmax}{a numeric vector providing the upper bound(s) for parameter(s) to
-be estimated. The default is Inf (i.e. unbounded)}
-
-\item{pmu}{a numeric vector providing the mean(s) of the prior
-distribution(s) for parameter(s) to be estimated}
-
-\item{psigma}{a numeric vector providing the square root(s) of the
-variance(s) of the prior distribution(s) for parameter(s) to be estimated}
-
 \item{pdist}{a character vector providing the prior distribution(s) for
-parameter(s) to be estimated (one of "uniform" of "normal")}
+parameter(s) to be estimated}
+
+\item{pd_args}{a vector of lists each element of which contains a list of
+parameters for the prior distribution for the parameters in \code{pname}}
 
 \item{...}{other arguments used to uniquely identify the parameter}
 }

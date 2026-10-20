@@ -17,20 +17,8 @@ prm_add_variances(
 \arguments{
 \item{prm_df}{a data frame as created by \link{prm_create_prm_df}}
 
-\item{pmin}{a numeric vector providing the lower bound(s) for parameter(s) to
-be estimated. The default is -Inf (i.e. unbounded).}
-
-\item{pmax}{a numeric vector providing the upper bound(s) for parameter(s) to
-be estimated. The default is Inf (i.e. unbounded)}
-
-\item{pmu}{a numeric vector providing the mean(s) of the prior
-distribution(s) for parameter(s) to be estimated}
-
-\item{psigma}{a numeric vector providing the square root(s) of the
-variance(s) of the prior distribution(s) for parameter(s) to be estimated}
-
 \item{pdist}{a character vector providing the prior distribution(s) for
-parameter(s) to be estimated (one of "uniform" of "normal")}
+parameter(s) to be estimated}
 
 \item{...}{other arguments used to uniquely identify the parameter}
 }

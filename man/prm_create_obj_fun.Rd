@@ -4,22 +4,20 @@
 \alias{prm_create_obj_fun}
 \title{Create an objective function}
 \usage{
-prm_create_obj_fun(obj, aggr, by)
+prm_create_obj_fun(expr, aggr_fun, ...)
 }
 \arguments{
-\item{obj}{an expression or formula calculating the value of the objective
+\item{expr}{an expression or formula calculating the value of the objective
 function in which the observed data are named \code{obs} and the
 corresponding simulated output data are named \code{yhat}}
 
-\item{aggr}{an expression or formula object for aggregating group-specific
-objective function values for groups indicated in the \code{by} argument
+\item{aggr_fun}{a function for aggregating group-specific
+objective function values for groups defined by indicated in the \code{by} argument
 into a single scalar result. The expression should use the name
-\code{obj_val} for the group-specific objective function values}
+\code{obj_val} for the group-specific objective function values
 
-\item{by}{an optional formula providing a set of grouping factors by which to
-group the initial calculation of the objective function value. For more
-details, see the \code{f} argument of the \link{split} method for data
-frames.}
+@param ... optional additional grouping factors for defining groups for the
+expressions in \code{expr}}
 }
 \description{
 Create an objective function

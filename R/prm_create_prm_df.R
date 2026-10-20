@@ -5,60 +5,41 @@
 #' @param pname a character vector providing the name(s) of parameter(s) to be
 #'  estimated
 #'
-#' @param pmin a numeric vector providing the lower bound(s) for parameter(s) to
-#'  be estimated. The default is -Inf (i.e. unbounded).
-#'
-#' @param pmax a numeric vector providing the upper bound(s) for parameter(s) to
-#'  be estimated. The default is Inf (i.e. unbounded)
-#'
-#' @param pmu a numeric vector providing the mean(s) of the prior
-#'  distribution(s) for parameter(s) to be estimated
-#'
-#' @param psigma a numeric vector providing the square root(s) of the
-#'  variance(s) of the prior distribution(s) for parameter(s) to be estimated
-#'
 #' @param pdist a character vector providing the prior distribution(s) for
-#'  parameter(s) to be estimated (one of "uniform" of "normal")
+#'  parameter(s) to be estimated
+#'
+#' @param pd_args a vector of lists each element of which contains a list of
+#'  parameters for the prior distribution for the parameters in \code{pname}
 #'
 #' @param ... other arguments used to uniquely identify the parameter
 #'
 prm_create_prm_df <- function(pname,
-                       pmin = -Inf,
-                       pmax = Inf,
-                       pmu = NA_real_,
-                       psigma = NA_real_,
-                       pdist = "uniform",
-                       pfmt = NA_character_,
+                       pdist = c("uniform", "normal", "student_t",
+                                 "gamma", "inv_gamma", "beta"),
+                       pd_args = list(pmin = -Inf, pmax = Inf),
                        ...){
 
   if(any(is.null(pname) | is.na(pname))) warning("pname cannot be NULL or missing")
-  if(all(is.null(pmin))) pmin = -Inf
-  if(all(is.null(pmax))) pmax = Inf
-  if(all(is.null(pmu))) pmu = NA_real_
-  if(all(is.null(psigma))) psigma = NA_real_
-  if(all(is.null(pdist))) pdist = "uniform"
+  pdist <- match.arg(pdist)
 
-  prm <- data.frame(pname = pname, pmin = pmin, pmax = pmax, pmu = pmu,
-                    psigma = psigma, pdist = pdist, pfmt = pfmt, ...) |>
+  prm <- data.frame(pname = pname, pd_args = I(pd_args), pdist = pdist, pfmt = pfmt, ...) |>
     within({
-      pdensity = mapply(prm_prior_density_function,
-                        pmin = pmin,
-                        pmax = pmax,
-                        pmu = pmu,
-                        psigma = psigma,
-                        pdist = pdist,
-                        SIMPLIFY = FALSE)
-      psampler = mapply(prm_prior_sampler_function,
-                        pmin = pmin,
-                        pmax = pmax,
-                        pmu = pmu,
-                        psigma = psigma,
-                        pdist = pdist,
-                        SIMPLIFY = FALSE)
+      pdensity = mapply(\(.dist, .args){
+        do.call(prm_prior_density_function,
+                args = c(list(pdist = .dist), .args))},
+        .dist = pdist,
+        .args = pd_args,
+        SIMPLIFY = FALSE)
+      psampler = mapply(\(.dist, .args){
+        do.call(prm_prior_sampler_function,
+                args = c(list(pdist = .dist), .args))},
+        .dist = pdist,
+        .args = pd_args,
+        SIMPLIFY = FALSE)
       ptransform = lapply(pname, \(.x) NULL)
       pnum = seq_along(pname)
     }) |>
-    subset(select = -c(pmin, pmax, pmu, psigma, pdist)) |>
+    subset(select = -c(pd_args, pdist)) |>
     prm_add_pregex() |>
     as_prm_df()
 
