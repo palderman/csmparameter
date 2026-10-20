@@ -35,8 +35,13 @@ tnorm_test_vector <- function(pmin, pmax, pmu, psigma){
 }
 
 normal_prior_density <- function(pmin, pmax, pmu, psigma){
-  if(is.na(pmin) || is.null(pmin)) pmin <- -Inf
-  if(is.na(pmax) || is.null(pmax)) pmax <- Inf
+
+  if(missing(pmin) || is.na(pmin) || is.null(pmin)){
+    pmin <- -Inf
+  }
+  if(missing(pmax) || is.na(pmax) || is.null(pmax)){
+    pmax <- Inf
+  }
 
   function(pval){
     if(pval <= pmin || pval >= pmax) return(-Inf)
@@ -47,8 +52,12 @@ normal_prior_density <- function(pmin, pmax, pmu, psigma){
 
 uniform_prior_density <- function(pmin, pmax){
 
-  if(is.na(pmin) || is.null(pmin)) pmin <- -Inf
-  if(is.na(pmax) || is.null(pmax)) pmax <- Inf
+  if(missing(pmin) || is.na(pmin) || is.null(pmin)){
+    pmin <- -Inf
+  }
+  if(missing(pmax) || is.na(pmax) || is.null(pmax)){
+    pmax <- Inf
+  }
 
   function(pval){
     if(pval <= pmin || pval >= pmax) return(-Inf)
@@ -58,8 +67,12 @@ uniform_prior_density <- function(pmin, pmax){
 
 student_t_prior_density <- function(pmin, pmax, pmu, psigma, pnu){
 
-    if(is.na(pmin) || is.null(pmin)) pmin <- -Inf
-    if(is.na(pmax) || is.null(pmax)) pmax <- Inf
+  if(missing(pmin) || is.na(pmin) || is.null(pmin)){
+    pmin <- -Inf
+  }
+  if(missing(pmax) || is.na(pmax) || is.null(pmax)){
+    pmax <- Inf
+  }
 
     function(pval){
       if(pval <= pmin || pval >= pmax) return(-Inf)

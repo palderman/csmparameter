@@ -1,7 +1,11 @@
 uniform_prior_sampler <- function(pmin, pmax){
 
-  if(is.na(pmin) || is.null(pmin)) pmin <- -.Machine$double.xmax
-  if(is.na(pmax) || is.null(pmax)) pmax <- .Machine$double.xmax
+  if(missing(pmin) || is.na(pmin) || is.null(pmin)){
+    pmin <- -.Machine$double.xmax
+  }
+  if(missing(pmax) || is.na(pmax) || is.null(pmax)){
+    pmax <- .Machine$double.xmax
+  }
 
   function(n, p = runif(n)){
     exp(log(p) + log(pmax - pmin)) + pmin
@@ -10,8 +14,12 @@ uniform_prior_sampler <- function(pmin, pmax){
 
 normal_prior_sampler <- function(pmin, pmax, pmu, psigma){
 
-  if(is.na(pmin) || is.null(pmin)) pmin <- -Inf
-  if(is.na(pmax) || is.null(pmax)) pmax <- Inf
+  if(missing(pmin) || is.na(pmin) || is.null(pmin)){
+    pmin <- -Inf
+  }
+  if(missing(pmax) || is.na(pmax) || is.null(pmax)){
+    pmax <- Inf
+  }
 
   function(n, p = runif(n)){
     prob_min <- pnorm(pmin, mean = pmu, sd = psigma)
@@ -23,8 +31,12 @@ normal_prior_sampler <- function(pmin, pmax, pmu, psigma){
 
 student_t_prior_sampler <- function(pmin, pmax, pmu, psigma, pnu){
 
-  if(is.na(pmin) || is.null(pmin)) pmin <- -Inf
-  if(is.na(pmax) || is.null(pmax)) pmax <- Inf
+  if(missing(pmin) || is.na(pmin) || is.null(pmin)){
+    pmin <- -Inf
+  }
+  if(missing(pmax) || is.na(pmax) || is.null(pmax)){
+    pmax <- Inf
+  }
 
   function(n, p = runif(n)){
     prob_min <- pt((pmin - pmu)/psigma, df = pnu)
