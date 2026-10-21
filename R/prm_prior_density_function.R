@@ -83,13 +83,13 @@ student_t_prior_density <- function(pmin, pmax, pmu, psigma, pnu){
 
 inv_gamma_prior_density <- function(palpha, pbeta){
   function(pval){
-    dgamma(1/pval, shape = palpha, rate = pbeta)- 2 * log(pval)
+    dgamma(1/pval, shape = palpha, rate = pbeta, log = TRUE)- 2 * log(pval)
   }
 }
 
 gamma_prior_density <- function(palpha, pbeta){
   function(pval){
-    dgamma(pval, shape = palpha, rate = pbeta)
+    dgamma(pval, shape = palpha, rate = pbeta, log = TRUE)
   }
 }
 
@@ -97,7 +97,7 @@ beta_prior_density <- function(pmu, prho){
   function(pval){
     shape1 <- pmu*(1-prho)/prho
     shape2 <-(1-pmu)*(1-prho)/prho
-    dbeta(pval, shape = palpha, rate = pbeta)
+    dbeta(pval, shape = palpha, rate = pbeta, log = TRUE)
   }
 }
 
