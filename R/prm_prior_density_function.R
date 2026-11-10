@@ -97,7 +97,7 @@ beta_prior_density <- function(pmu, prho){
   function(pval){
     shape1 <- pmu*(1-prho)/prho
     shape2 <-(1-pmu)*(1-prho)/prho
-    dbeta(pval, shape = palpha, rate = pbeta, log = TRUE)
+    dbeta(pval, shape1 = palpha, shape2 = pbeta, log = TRUE)
   }
 }
 

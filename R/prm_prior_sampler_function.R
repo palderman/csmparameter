@@ -62,7 +62,7 @@ beta_prior_sampler <- function(pmu, prho){
   function(n, p = runif(n)){
     shape1 <- pmu*(1-prho)/prho
     shape2 <-(1-pmu)*(1-prho)/prho
-    qbeta(p, shape = palpha, rate = pbeta)
+    qbeta(p, shape1 = palpha, shape2 = pbeta)
   }
 }
 
